@@ -115,13 +115,28 @@ export default function KontaktyPage() {
                   </div>
                 </div>
 
-                {/* Map Placeholder */}
-                <div className="mt-6 h-40 rounded-xl bg-muted flex items-center justify-center border border-border">
-                  <div className="text-center text-muted-foreground">
-                    <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Mapa sídla společnosti</p>
-                  </div>
+                {/* Map - Podvesná VII/6192, 760 01 Zlín */}
+                <div className="mt-6 h-48 sm:h-56 rounded-xl overflow-hidden border border-border">
+                  <iframe
+                    title="Mapa sídla společnosti - Podvesná VII/6192, Zlín"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=17.648%2C49.218%2C17.678%2C49.232&layer=mapnik&marker=49.225%2C17.663"
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    sandbox="allow-scripts"
+                  />
                 </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  <a
+                    href="https://www.openstreetmap.org/?mlat=49.225&mlon=17.663#map=16/49.225/17.663"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Zobrazit větší mapu
+                  </a>
+                </p>
               </CardContent>
             </Card>
           </div>
