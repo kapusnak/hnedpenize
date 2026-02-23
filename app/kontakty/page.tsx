@@ -115,11 +115,11 @@ export default function KontaktyPage() {
                   </div>
                 </div>
 
-                {/* Map - Podvesná VII/6192, 760 01 Zlín */}
+                {/* Map - Podvesná VII/6192, 760 01 Zlín (coordinates from OSM geocoding) */}
                 <div className="mt-6 h-48 sm:h-56 rounded-xl overflow-hidden border border-border">
                   <iframe
                     title="Mapa sídla společnosti - Podvesná VII/6192, Zlín"
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=17.648%2C49.218%2C17.678%2C49.232&layer=mapnik&marker=49.225%2C17.663"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=17.673%2C49.222%2C17.695%2C49.233&layer=mapnik&marker=49.2274%2C17.6839"
                     className="w-full h-full border-0"
                     allowFullScreen
                     loading="lazy"
@@ -129,7 +129,7 @@ export default function KontaktyPage() {
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
                   <a
-                    href="https://www.openstreetmap.org/?mlat=49.225&mlon=17.663#map=16/49.225/17.663"
+                    href="https://www.openstreetmap.org/?mlat=49.2274&mlon=17.6839#map=17/49.2274/17.6839"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-primary transition-colors"

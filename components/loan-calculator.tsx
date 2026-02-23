@@ -87,15 +87,11 @@ function randomSocialProofAmount(min: number, max: number): string {
 }
 
 function getSocialProofText(): string {
-  const amount = randomSocialProofAmount(0.5, 7)
-  const useThirtyDays = Math.random() > 0.5
-  if (useThirtyDays) {
-    return `Za posledních 30 dní vyplaceno již ${amount} mil. Kč. Průměrná doba vyřízení: 24h.`
-  }
-  return `Dnes vyplaceno již ${amount} mil. Kč. Průměrná doba vyřízení: 24h.`
+  const amount = randomSocialProofAmount(2.1, 23)
+  return `Za posledních 30 dní vyplaceno již ${amount} mil. Kč. Průměrná doba vyřízení: 24h.`
 }
 
-const SOCIAL_PROOF_FALLBACK = "Dnes vyplaceno již 3.4 mil. Kč. Průměrná doba vyřízení: 24h."
+const SOCIAL_PROOF_FALLBACK = "Za posledních 30 dní vyplaceno již 3.9 mil. Kč. Průměrná doba vyřízení: 24h."
 
 export function LoanCalculator() {
   const [socialProofText, setSocialProofText] = useState(SOCIAL_PROOF_FALLBACK)
