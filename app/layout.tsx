@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { GoogleAdsGtag } from "@/components/google-ads-gtag"
 import { GoogleAnalytics } from "@/components/google-analytics"
 import { GoogleTagManager } from "@/components/google-tag-manager"
 import "./globals.css"
@@ -44,6 +45,7 @@ export default function RootLayout({
     <html lang="cs">
       <body className="font-sans antialiased">
         <GoogleTagManager />
+        <GoogleAdsGtag />
         {children}
         <GoogleAnalytics />
       </body>

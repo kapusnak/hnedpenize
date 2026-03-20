@@ -1,7 +1,8 @@
 import { Header } from "@/components/header"
 import { LoanCalculator } from "@/components/loan-calculator"
 import { LeadPopup } from "@/components/lead-popup"
-import { Zap, CheckCircle, MapPin, HomeIcon } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock } from "lucide-react"
 
 export default function Home() {
   const benefits = [
@@ -41,7 +42,7 @@ export default function Home() {
           <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-card blur-3xl" />
         </div>
 
-        <div className="container mx-auto px-4 pt-20 pb-6 lg:py-8 lg:pt-24 flex-1 flex flex-col relative z-10">
+        <div className="container mx-auto px-4 pt-28 pb-6 lg:py-8 lg:pt-24 flex-1 flex flex-col relative z-10">
           {/* Main Content */}
           <div className="flex-1 flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
             {/* Left Content - Now order-1 on mobile so text appears first */}
@@ -92,6 +93,61 @@ export default function Home() {
                   </div>
                 )
               })}
+            </div>
+
+            {/* Přímý kontakt - mobile only */}
+            <div className="mt-6 md:hidden">
+              <Card className="border-2 border-card/30 shadow-lg bg-card/95">
+                <CardContent className="p-4">
+                  <h2 className="text-lg font-bold text-foreground mb-4">Přímý kontakt</h2>
+
+                  <a
+                    href="tel:+420776075150"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mb-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Phone className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Zavolejte nám</p>
+                      <p className="text-base font-bold text-primary group-hover:underline">+420 776 075 150</p>
+                    </div>
+                  </a>
+
+                  <a
+                    href="tel:+420777400256"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mb-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Phone className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Zavolejte nám</p>
+                      <p className="text-base font-bold text-primary group-hover:underline">+420 777 400 256</p>
+                    </div>
+                  </a>
+
+                  <a
+                    href="mailto:info@docasnyvykup.cz"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mb-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Mail className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Napište nám</p>
+                      <p className="text-sm font-semibold text-primary group-hover:underline">info@docasnyvykup.cz</p>
+                    </div>
+                  </a>
+
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                    <Clock className="w-5 h-5 text-primary shrink-0" />
+                    <p className="text-muted-foreground text-sm">
+                      <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
