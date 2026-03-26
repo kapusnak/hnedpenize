@@ -3,12 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { sendLead } from "@/lib/emailjs"
 import { formatPhoneDisplay, parsePhoneDigits, toFullPhone } from "@/lib/phone-420"
 import { X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function LeadPopup() {
+  const pathname = usePathname()
   const [isVisible, setIsVisible] = useState(false)
   const [isClosed, setIsClosed] = useState(false)
   const [shouldShake, setShouldShake] = useState(false)
@@ -50,7 +52,7 @@ export function LeadPopup() {
     }
     setSubmitStatus("sending")
     try {
-      await sendLead({ source: "popup", phone: fullPhone })
+      await sendLead({ source: "popup", phone: fullPhone, pagePath: pathname })
       setSubmitStatus("success")
       setTimeout(() => handleClose(), 1500)
     } catch {

@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { sendLead } from "@/lib/emailjs"
 import { formatPhoneDisplay, parsePhoneDigits, toFullPhone } from "@/lib/phone-420"
 import { Phone } from "lucide-react"
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 export function CtaSection() {
+  const pathname = usePathname()
   const [phoneDigits, setPhoneDigits] = useState("")
   const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
 
@@ -22,7 +24,7 @@ export function CtaSection() {
     }
     setSubmitStatus("sending")
     try {
-      await sendLead({ source: "cta", phone: fullPhone })
+      await sendLead({ source: "cta", phone: fullPhone, pagePath: pathname })
       setSubmitStatus("success")
     } catch {
       setSubmitStatus("error")

@@ -16,6 +16,8 @@ export type LeadParams = {
   amount?: number
   assetType?: string
   serviceType?: string
+  /** Current path for GA (e.g. /kontakty); set for popup/cta phone leads */
+  pagePath?: string
 }
 
 const CALLBACK_ONLY_SERVICE = "Není relevantní (Callback)"
@@ -57,6 +59,9 @@ export async function sendLead(params: LeadParams): Promise<void> {
 
   trackLeadGenerated({
     source: params.source,
+    ...(params.pagePath != null && params.pagePath !== ""
+      ? { pagePath: params.pagePath }
+      : {}),
     ...(params.amount != null && Number.isFinite(params.amount)
       ? { leadValue: params.amount }
       : {}),

@@ -11,6 +11,8 @@ export type LeadSource = "calculator" | "popup" | "cta"
 export function trackLeadGenerated(params: {
   source: LeadSource
   leadValue?: number
+  /** e.g. /kontakty — for phone_lead breakdown (popup + CTA sections) */
+  pagePath?: string
 }): void {
   if (typeof window === "undefined") return
   const gtag = window.gtag
@@ -28,6 +30,16 @@ export function trackLeadGenerated(params: {
   }
 
   gtag("event", "generate_lead", eventParams)
+
+  if (params.source === "popup" || params.source === "cta") {
+    const phoneLeadParams: Record<string, string> = {
+      lead_source: params.source,
+    }
+    if (params.pagePath) {
+      phoneLeadParams.page_path = params.pagePath
+    }
+    gtag("event", "phone_lead", phoneLeadParams)
+  }
 
   const sendTo = GOOGLE_ADS_LEAD_CONVERSION_SEND_TO?.trim()
   if (sendTo) {
