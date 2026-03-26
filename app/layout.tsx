@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     images: ["/og-social-share.png"],
   },
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png", sizes: "32x32" }],
+    icon: [{ url: "/logo-house-lock.png", type: "image/png", sizes: "88x84" }],
   },
 }
 
