@@ -19,7 +19,8 @@ Create `.env.local` (copy from `.env.example`) **before** building. These are ba
 See `.env.example` for the full list. Variables (all optional except EmailJS for working forms):
 
 - **NEXT_PUBLIC_GTM_ID:** Google Tag Manager container ID (e.g. `GTM-MJBCTMVT`). If set, GTM is loaded (beforeInteractive). You can use this instead of or alongside GA4.
-- **NEXT_PUBLIC_GA_MEASUREMENT_ID:** Google Analytics 4 Measurement ID (e.g. `G-XXXXXXXXXX`). If set, gtag.js is loaded for GA4.
+- **NEXT_PUBLIC_GA_MEASUREMENT_ID:** Google Analytics 4 Measurement ID (e.g. `G-XXXXXXXXXX`). If set, gtag.js is loaded for GA4. After a successful lead email via EmailJS, the app sends a **`generate_lead`** event (with `lead_source`: `calculator`, `cta`, or `popup`; optional `value`/`currency` for calculator leads). In GA4, mark **`generate_lead`** as a key event (conversion), then in Google Ads link this GA4 property and **import** that conversion—do not also set **NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION_SEND_TO** for the same goal, or you risk double counting.
+- **NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION_SEND_TO:** Optional. Full Google Ads conversion `send_to` string (`AW-XXXXXXXXX/label`). If set, the app fires a **`conversion`** event in addition to **`generate_lead`**. Use only if you are **not** importing the GA4 `generate_lead` event into Google Ads for the same lead action.
 - **NEXT_PUBLIC_EMAILJS_***:** Required for contact forms. Public key, service ID, and template ID from [emailjs.com](https://www.emailjs.com/). Template variables: `{{source}}`, `{{phone}}`, `{{name}}`, `{{amount}}`, `{{assetType}}` / `{{collateralType}}` (Typ zajištění: Nemovitost / Automobil), `{{serviceType}}`. For CTA/popup (phone-only “callback”) the app sends: name/assetType `---`, serviceType `Není relevantní (Callback)`, amount `--- Pouze požadavek na zavolání ---`; use these in one template to get the “NOVÁ POPTÁVKA K POSOUZENÍ” callback email format.
 
 The `.env.example` in this repo is pre-filled with the same values as your other static build (`hnedpenize`), so you can copy it to `.env.local` and run `npm run build` to get a working static site (forms + GTM) without changing anything.
@@ -76,3 +77,10 @@ That makes `/jak-to-funguje` serve `jak-to-funguje.html`. Adjust if your host us
 - **Analytics:** **Google Analytics** only, loaded via script; no server needed.
 
 No Node.js runtime or third-party PaaS is required on Wedos.
+
+## GA4 lead conversion and Google Ads
+
+1. Set **`NEXT_PUBLIC_GA_MEASUREMENT_ID`**, rebuild, and deploy. Submit a test lead; in GA4 use **Realtime** or **DebugView** to confirm the **`generate_lead`** event.
+2. In GA4 **Admin**, open **Events** (or **Key events**), find **`generate_lead`**, and mark it as a **key event** (conversion).
+3. In Google Ads, under **Linked accounts**, link the **same** GA4 property. Under **Conversions**, create an **Import** from **Google Analytics 4** and select **`generate_lead`**.
+4. Prefer **either** GA4 import **or** **`NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION_SEND_TO`**, not both, for the same lead goal.

@@ -1,5 +1,7 @@
 import emailjs from "@emailjs/browser"
 
+import { trackLeadGenerated } from "@/lib/track-lead-conversion"
+
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
 const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
 const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
@@ -52,6 +54,13 @@ export async function sendLead(params: LeadParams): Promise<void> {
           : "",
   }
   await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, { publicKey: PUBLIC_KEY })
+
+  trackLeadGenerated({
+    source: params.source,
+    ...(params.amount != null && Number.isFinite(params.amount)
+      ? { leadValue: params.amount }
+      : {}),
+  })
 
   // Send client success/confirmation email when we have the client's email (e.g. from calculator form).
   // EmailJS template template_3t8h00d uses "To Email" = {{email}}, so we must pass `email`.
