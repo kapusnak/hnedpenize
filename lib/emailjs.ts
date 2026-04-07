@@ -31,13 +31,17 @@ function formatAmountCzk(value: number): string {
   return `${withSpaces},- Kč`
 }
 
-/** Value for EmailJS `{{source}}` — public site URL only (no label prefix; GA still uses `params.source`). */
+/**
+ * Value for EmailJS `{{source}}` — public site URL only (e.g. `https://hnedpenize.cz`).
+ * The template should use the “Zdroj:” label; do not prefix here. Strips a mistaken `Odesláno z:` from env.
+ */
 function leadEmailSourceUrl(): string {
   const origin =
     typeof window !== "undefined" && window.location?.origin
       ? window.location.origin
       : (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/$/, "")
-  return origin || "—"
+  const cleaned = (origin || "—").replace(/^Odesláno z:\s*/i, "").trim()
+  return cleaned || "—"
 }
 
 function formatEmailJsError(err: unknown): string {
