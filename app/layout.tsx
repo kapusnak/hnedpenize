@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { AppToaster } from "@/components/app-toaster"
 import { GoogleAdsGtag } from "@/components/google-ads-gtag"
 import { GoogleAnalytics } from "@/components/google-analytics"
 import { GoogleTagManager } from "@/components/google-tag-manager"
@@ -48,6 +49,7 @@ export default function RootLayout({
         <GoogleAdsGtag />
         {children}
         <GoogleAnalytics />
+        <AppToaster />
       </body>
     </html>
   )

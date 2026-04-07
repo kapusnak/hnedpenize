@@ -2,16 +2,23 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { z } from "zod"
+import Link from "next/link"
+
 import { sendLead } from "@/lib/emailjs"
-import { formatPhoneDisplay, parsePhoneDigits, toFullPhone } from "@/lib/phone-420"
+import { toFullPhone } from "@/lib/phone-420"
 import { Card, CardContent } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Building2, Car, TrendingUp, Lock } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PhoneDigitsInput } from "@/components/phone-digits-input"
+import { Building2, Car, Lock, TrendingUp } from "lucide-react"
 
 const LOCK_THRESHOLD_PX = 10
 
@@ -43,15 +50,12 @@ function SliderTouchLock({
     [minIndex, maxIndex],
   )
 
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      const t = e.touches[0]
-      if (!t) return
-      startRef.current = { x: t.clientX, y: t.clientY }
-      lockedRef.current = null
-    },
-    [],
-  )
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0]
+    if (!t) return
+    startRef.current = { x: t.clientX, y: t.clientY }
+    lockedRef.current = null
+  }, [])
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent) => {
@@ -96,7 +100,6 @@ function SliderTouchLock({
       style={{ touchAction: "pan-y" }}
     >
       {children}
-      {/* Overlay only captures touch on touch devices (hover: none); mouse goes to slider */}
       <div
         className="absolute inset-0 z-10 pointer-events-none [@media(hover:none)]:pointer-events-auto"
         aria-hidden
@@ -108,13 +111,12 @@ function SliderTouchLock({
 const REAL_ESTATE_RANGE = { min: 100000, max: 25000000, step: 100000 }
 const CAR_RANGE = { min: 50000, max: 5000000, step: 5000 }
 
-/** Car amount scale: 50k–500k (10k steps) so 500k is at 50% position, then 100k steps from 600k to 5M */
 const CAR_AMOUNT_VALUES = (() => {
   const low: number[] = []
-  for (let v = 50000; v <= 500000; v += 10000) low.push(v) // 46 values, last = 500k
+  for (let v = 50000; v <= 500000; v += 10000) low.push(v)
   const high: number[] = []
-  for (let v = 600000; v <= 5000000; v += 100000) high.push(v) // 45 values
-  return [...low, ...high] // 91 total; index 45 = 500k (middle)
+  for (let v = 600000; v <= 5000000; v += 100000) high.push(v)
+  return [...low, ...high]
 })()
 
 function snapToCarValue(value: number): number {
@@ -134,7 +136,6 @@ function carAmountToIndex(value: number): number {
   return idx >= 0 ? idx : 0
 }
 
-/** Progressive real-estate amount scale: 10k steps up to 500k, then 100k steps to 25M */
 const REAL_ESTATE_AMOUNT_VALUES = (() => {
   const low: number[] = []
   for (let v = 100000; v <= 500000; v += 10000) low.push(v)
@@ -167,12 +168,9 @@ const realEstateServices = [
   { value: "bez-zajisteni", label: "Bez zajištění" },
 ]
 
-const carServices = [{ value: "penize-ihned", label: "Peníze ihned a jezděte dál" }]
-
 const DEFAULT_REAL_ESTATE_AMOUNT = 2000000
 const DEFAULT_CAR_AMOUNT = 100000
 
-/** Random value in [min, max] with one decimal place. Same on each load, varies on reload. */
 function randomSocialProofAmount(min: number, max: number): string {
   const value = min + Math.random() * (max - min)
   return value.toFixed(1).replace(/\.0$/, "")
@@ -185,33 +183,147 @@ function getSocialProofText(): string {
 
 const SOCIAL_PROOF_FALLBACK = "Za posledních 30 dní vyplaceno již 3.9 mil. Kč. Průměrná doba vyřízení: 24h."
 
+const serviceTypeEnum = z.enum(["zpetny-leasing", "zastava", "primy-vykup", "bez-zajisteni"])
+
+const calculatorSchema = z
+  .object({
+    assetMode: z.enum(["real-estate", "car"]),
+    name: z.string(),
+    email: z.string(),
+    phoneDigits: z.string(),
+    serviceType: serviceTypeEnum,
+    amountCzk: z.number(),
+    firstName: z.string(),
+    lastName: z.string(),
+    vehicleModel: z.string(),
+    year: z.string(),
+    mileage: z.string(),
+    vin: z.string(),
+    vehicleAmountCzk: z.number(),
+  })
+  .superRefine((data, ctx) => {
+    if (!z.string().email().safeParse(data.email.trim()).success) {
+      ctx.addIssue({ code: "custom", message: "Zadejte platný e-mail.", path: ["email"] })
+    }
+    if (toFullPhone(data.phoneDigits) === "") {
+      ctx.addIssue({
+        code: "custom",
+        message: "Zadejte platné telefonní číslo (9 číslic).",
+        path: ["phoneDigits"],
+      })
+    }
+
+    if (data.assetMode === "real-estate") {
+      if (data.name.trim().length < 2) {
+        ctx.addIssue({ code: "custom", message: "Zadejte jméno.", path: ["name"] })
+      }
+      if (data.amountCzk < REAL_ESTATE_RANGE.min || data.amountCzk > REAL_ESTATE_RANGE.max) {
+        ctx.addIssue({ code: "custom", message: "Neplatná částka.", path: ["amountCzk"] })
+      }
+    } else {
+      if (data.firstName.trim().length < 1) {
+        ctx.addIssue({ code: "custom", message: "Zadejte jméno.", path: ["firstName"] })
+      }
+      if (data.lastName.trim().length < 1) {
+        ctx.addIssue({ code: "custom", message: "Zadejte příjmení.", path: ["lastName"] })
+      }
+      if (data.vehicleModel.trim().length < 1) {
+        ctx.addIssue({ code: "custom", message: "Zadejte značku a model.", path: ["vehicleModel"] })
+      }
+      if (data.year.trim().length < 2) {
+        ctx.addIssue({ code: "custom", message: "Zadejte rok výroby.", path: ["year"] })
+      }
+      if (data.mileage.trim().length < 1) {
+        ctx.addIssue({ code: "custom", message: "Zadejte počet kilometrů.", path: ["mileage"] })
+      }
+      if (data.vehicleAmountCzk < CAR_RANGE.min || data.vehicleAmountCzk > CAR_RANGE.max) {
+        ctx.addIssue({ code: "custom", message: "Neplatná částka.", path: ["vehicleAmountCzk"] })
+      }
+    }
+  })
+
+type CalculatorFormValues = z.infer<typeof calculatorSchema>
+
+function emptyCarFields(): Pick<
+  CalculatorFormValues,
+  "firstName" | "lastName" | "vehicleModel" | "year" | "mileage" | "vin" | "vehicleAmountCzk"
+> {
+  return {
+    firstName: "",
+    lastName: "",
+    vehicleModel: "",
+    year: "",
+    mileage: "",
+    vin: "",
+    vehicleAmountCzk: snapToCarValue(DEFAULT_CAR_AMOUNT),
+  }
+}
+
+function emptyRealEstateFields(): Pick<CalculatorFormValues, "name" | "serviceType" | "amountCzk"> {
+  return {
+    name: "",
+    serviceType: "zpetny-leasing",
+    amountCzk: snapToRealEstateValue(DEFAULT_REAL_ESTATE_AMOUNT),
+  }
+}
+
+const phoneInputWrapperClass =
+  "flex h-11 w-full items-center rounded-md border border-border bg-secondary px-3 text-sm shadow-sm outline-none transition-[color,box-shadow] focus-within:ring-[3px] focus-within:ring-ring/50 focus-within:border-ring"
+
+const requiredStar = <span className="text-red-600">*</span>
+
 export function LoanCalculator() {
   const [socialProofText, setSocialProofText] = useState(SOCIAL_PROOF_FALLBACK)
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
 
   useEffect(() => {
     setSocialProofText(getSocialProofText())
   }, [])
 
-  const [assetType, setAssetType] = useState<"real-estate" | "car">("real-estate")
-  const [serviceType, setServiceType] = useState("zpetny-leasing")
-  const [amount, setAmount] = useState([snapToRealEstateValue(DEFAULT_REAL_ESTATE_AMOUNT)])
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phoneDigits, setPhoneDigits] = useState("")
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
+  const defaultValues: CalculatorFormValues = {
+    assetMode: "real-estate",
+    ...emptyRealEstateFields(),
+    email: "",
+    phoneDigits: "",
+    ...emptyCarFields(),
+  }
 
-  const currentRange = assetType === "real-estate" ? REAL_ESTATE_RANGE : CAR_RANGE
-  const currentServices = assetType === "real-estate" ? realEstateServices : carServices
+  const form = useForm<CalculatorFormValues>({
+    resolver: zodResolver(calculatorSchema),
+    defaultValues,
+    mode: "onSubmit",
+  })
 
-  useEffect(() => {
-    if (assetType === "real-estate") {
-      setAmount([snapToRealEstateValue(DEFAULT_REAL_ESTATE_AMOUNT)])
-      setServiceType("zpetny-leasing")
-    } else {
-      setAmount([snapToCarValue(DEFAULT_CAR_AMOUNT)])
-      setServiceType("penize-ihned")
-    }
-  }, [assetType])
+  const assetMode = form.watch("assetMode")
+  const amountCzk = form.watch("amountCzk")
+  const vehicleAmountCzk = form.watch("vehicleAmountCzk")
+
+  const switchAssetMode = useCallback(
+    (mode: "real-estate" | "car") => {
+      const email = form.getValues("email")
+      const phoneDigits = form.getValues("phoneDigits")
+      if (mode === "car") {
+        form.reset({
+          assetMode: "car",
+          email,
+          phoneDigits,
+          ...emptyRealEstateFields(),
+          name: "",
+          ...emptyCarFields(),
+        })
+      } else {
+        form.reset({
+          assetMode: "real-estate",
+          email,
+          phoneDigits,
+          ...emptyRealEstateFields(),
+          ...emptyCarFields(),
+        })
+      }
+      setSubmitStatus("idle")
+    },
+    [form],
+  )
 
   const formatAmount = (value: number) => {
     if (value >= 1000000) {
@@ -227,27 +339,80 @@ export function LoanCalculator() {
     return `${(value / 1000).toFixed(0)} tis. Kč`
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const fullPhone = toFullPhone(phoneDigits)
-    if (!fullPhone) {
-      setSubmitStatus("error")
-      return
-    }
+  const maxIdxRe = REAL_ESTATE_AMOUNT_VALUES.length - 1
+  const valueIndexRe = realEstateAmountToIndex(amountCzk)
+  const maxIdxCar = CAR_AMOUNT_VALUES.length - 1
+  const valueIndexCar = carAmountToIndex(vehicleAmountCzk)
+
+  const onSubmit = async (values: CalculatorFormValues) => {
+    const phone = toFullPhone(values.phoneDigits)
+    if (!phone) return
     setSubmitStatus("sending")
     try {
+      let name: string
+      let amount: number
+      let assetType: string
+      let serviceType: string
+      if (values.assetMode === "real-estate") {
+        name = values.name.trim()
+        amount = snapToRealEstateValue(values.amountCzk)
+        assetType = "Nemovitost"
+        serviceType =
+          realEstateServices.find((s) => s.value === values.serviceType)?.label ?? values.serviceType
+      } else {
+        name = `${values.firstName.trim()} ${values.lastName.trim()}`.trim()
+        amount = snapToCarValue(values.vehicleAmountCzk)
+        assetType = "Automobil"
+        const vinPart = values.vin.trim() ? `, VIN ${values.vin.trim()}` : ""
+        serviceType = `Peníze ihned a jezděte dál — ${values.vehicleModel.trim()}, r.v. ${values.year.trim()}, ${values.mileage.trim()} km${vinPart}`
+      }
       await sendLead({
         source: "calculator",
-        phone: fullPhone,
-        email: email.trim() || undefined,
+        phone,
+        email: values.email.trim(),
         name,
-        amount: amount[0],
-        assetType: assetType === "real-estate" ? "Nemovitost" : "Automobil",
-        serviceType: currentServices.find((s) => s.value === serviceType)?.label ?? serviceType,
+        amount,
+        assetType,
+        serviceType,
       })
       setSubmitStatus("success")
-    } catch {
+      toast.success("Děkujeme za poptávku", {
+        id: "lead-calculator-success",
+        description: "Brzy vás budeme kontaktovat. Zkontrolujte prosím i složku s nevyžádanou poštou.",
+        duration: 5000,
+      })
+      const emailKeep = values.email
+      const phoneKeep = values.phoneDigits
+      if (values.assetMode === "real-estate") {
+        form.reset({
+          assetMode: "real-estate",
+          email: emailKeep,
+          phoneDigits: phoneKeep,
+          ...emptyRealEstateFields(),
+          ...emptyCarFields(),
+        })
+      } else {
+        form.reset({
+          assetMode: "car",
+          email: emailKeep,
+          phoneDigits: phoneKeep,
+          ...emptyRealEstateFields(),
+          name: "",
+          ...emptyCarFields(),
+        })
+      }
+    } catch (e) {
       setSubmitStatus("error")
+      const hint = e instanceof Error ? e.message.trim() : ""
+      const description =
+        hint.length > 0 && hint.length <= 220
+          ? hint
+          : "Zkuste to prosím znovu nebo nás kontaktujte telefonicky. Podrobnosti jsou v konzoli prohlížeče (F12)."
+      toast.error("Odeslání se nepovedlo", {
+        id: "lead-calculator-error",
+        description,
+        duration: 9000,
+      })
     }
   }
 
@@ -264,167 +429,365 @@ export function LoanCalculator() {
             <span className="text-[11px] font-medium text-green-700">Specialisté online • Kapacita volná</span>
           </div>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label className="text-sm font-medium text-muted-foreground">Typ zajištění</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setAssetType("real-estate")}
-                className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all active:scale-[0.98] ${
-                  assetType === "real-estate"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary text-muted-foreground hover:border-primary/50"
-                }`}
-              >
-                <Building2 className="w-4 h-4" />
-                <span className="font-medium text-sm">Nemovitost</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setAssetType("car")}
-                className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all active:scale-[0.98] ${
-                  assetType === "car"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-secondary text-muted-foreground hover:border-primary/50"
-                }`}
-              >
-                <Car className="w-4 h-4" />
-                <span className="font-medium text-sm">Automobil</span>
-              </button>
-            </div>
-          </div>
+            <Tabs
+              value={assetMode}
+              onValueChange={(v) => switchAssetMode(v as "real-estate" | "car")}
+              className="gap-3"
+            >
+              <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-none bg-transparent p-0">
+                <TabsTrigger
+                  value="real-estate"
+                  className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg border-2 px-3 py-3 text-sm font-semibold shadow-none transition-all data-[state=active]:border-primary data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=inactive]:border-border data-[state=inactive]:bg-secondary data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-primary/50"
+                >
+                  <Building2 className="h-4 w-4 shrink-0" aria-hidden />
+                  Nemovitost
+                </TabsTrigger>
+                <TabsTrigger
+                  value="car"
+                  className="flex min-h-[52px] items-center justify-center gap-2 rounded-lg border-2 px-3 py-3 text-sm font-semibold shadow-none transition-all data-[state=active]:border-primary data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=inactive]:border-border data-[state=inactive]:bg-secondary data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-primary/50"
+                >
+                  <Car className="h-4 w-4 shrink-0" aria-hidden />
+                  Vozidlo
+                </TabsTrigger>
+              </TabsList>
 
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-muted-foreground">Typ služby</Label>
-            {assetType === "car" ? (
-              <div className="p-3 rounded-lg bg-primary/10 border-2 border-primary">
-                <span className="font-medium text-sm text-primary">{carServices[0].label}</span>
-              </div>
-            ) : (
-              <div className="flex flex-wrap lg:flex-nowrap gap-2 min-w-0" role="radiogroup" aria-label="Typ služby">
-                {realEstateServices.map((service) => (
-                  <button
-                    key={service.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={serviceType === service.value}
-                    onClick={() => setServiceType(service.value)}
-                    className={`flex items-center justify-center min-w-0 lg:flex-1 px-3 lg:px-1.5 py-2.5 rounded-lg transition-all text-xs font-medium text-center whitespace-normal leading-tight ${
-                      serviceType === service.value
-                        ? "bg-primary/10 border-2 border-primary text-primary"
-                        : "bg-secondary border-2 border-transparent text-muted-foreground hover:border-primary/30"
-                    }`}
+              <TabsContent value="real-estate" className="mt-0 space-y-4 outline-none">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Typ služby</Label>
+                  <div className="flex flex-wrap lg:flex-nowrap gap-2 min-w-0" role="radiogroup" aria-label="Typ služby">
+                    {realEstateServices.map((service) => (
+                      <button
+                        key={service.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={form.watch("serviceType") === service.value}
+                        onClick={() =>
+                          form.setValue("serviceType", service.value as CalculatorFormValues["serviceType"])
+                        }
+                        className={`flex items-center justify-center min-w-0 lg:flex-1 px-3 lg:px-1.5 py-2.5 rounded-lg transition-all text-xs font-medium text-center whitespace-normal leading-tight ${
+                          form.watch("serviceType") === service.value
+                            ? "bg-primary/10 border-2 border-primary text-primary"
+                            : "bg-secondary border-2 border-transparent text-muted-foreground hover:border-primary/30"
+                        }`}
+                      >
+                        {service.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-muted-foreground">Požadovaná částka</Label>
+                    <span className="text-base font-bold text-primary">{formatAmount(snapToRealEstateValue(amountCzk))}</span>
+                  </div>
+                  <SliderTouchLock
+                    minIndex={0}
+                    maxIndex={maxIdxRe}
+                    valueIndex={valueIndexRe}
+                    onValueChange={(i) =>
+                      form.setValue("amountCzk", REAL_ESTATE_AMOUNT_VALUES[i], { shouldValidate: true })
+                    }
                   >
-                    {service.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium text-muted-foreground">Požadovaná částka</Label>
-              <span className="text-base font-bold text-primary">{formatAmount(amount[0])}</span>
-            </div>
-            {assetType === "real-estate" ? (
-              <>
-                <SliderTouchLock
-                  minIndex={0}
-                  maxIndex={REAL_ESTATE_AMOUNT_VALUES.length - 1}
-                  valueIndex={realEstateAmountToIndex(amount[0])}
-                  onValueChange={(i) => setAmount([REAL_ESTATE_AMOUNT_VALUES[i]])}
-                >
-                  <Slider
-                    value={[realEstateAmountToIndex(amount[0])]}
-                    onValueChange={([i]) => setAmount([REAL_ESTATE_AMOUNT_VALUES[i]])}
-                    min={0}
-                    max={REAL_ESTATE_AMOUNT_VALUES.length - 1}
-                    step={1}
-                    className="w-full"
+                    <Slider
+                      value={[valueIndexRe]}
+                      onValueChange={([i]) =>
+                        form.setValue("amountCzk", REAL_ESTATE_AMOUNT_VALUES[i], { shouldValidate: true })
+                      }
+                      min={0}
+                      max={maxIdxRe}
+                      step={1}
+                      className="w-full"
+                    />
+                  </SliderTouchLock>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{formatRangeLabel(REAL_ESTATE_RANGE.min)}</span>
+                    <span>{formatRangeLabel(REAL_ESTATE_RANGE.max)}</span>
+                  </div>
+                  <Controller
+                    name="amountCzk"
+                    control={form.control}
+                    render={({ field }) => <input type="hidden" {...field} value={field.value} readOnly />}
                   />
-                </SliderTouchLock>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{formatRangeLabel(REAL_ESTATE_RANGE.min)}</span>
-                  <span>{formatRangeLabel(REAL_ESTATE_RANGE.max)}</span>
                 </div>
-              </>
-            ) : (
-              <>
-                <SliderTouchLock
-                  minIndex={0}
-                  maxIndex={CAR_AMOUNT_VALUES.length - 1}
-                  valueIndex={carAmountToIndex(amount[0])}
-                  onValueChange={(i) => setAmount([CAR_AMOUNT_VALUES[i]])}
-                >
-                  <Slider
-                    value={[carAmountToIndex(amount[0])]}
-                    onValueChange={([i]) => setAmount([CAR_AMOUNT_VALUES[i]])}
-                    min={0}
-                    max={CAR_AMOUNT_VALUES.length - 1}
-                    step={1}
-                    className="w-full"
+
+                <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
+                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span className="text-[11px] text-muted-foreground">{socialProofText}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="name" className="text-sm font-medium text-muted-foreground">
+                      Jméno a příjmení {requiredStar}
+                    </Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      autoComplete="name"
+                      placeholder="Jan Novák"
+                      className="bg-secondary border-border h-11 text-sm"
+                      aria-invalid={Boolean(form.formState.errors.name)}
+                      aria-describedby={form.formState.errors.name ? "name-error" : undefined}
+                      {...form.register("name")}
+                    />
+                    {form.formState.errors.name && (
+                      <p id="name-error" className="mt-1 text-sm text-red-600">
+                        {form.formState.errors.name.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="phone-nem" className="text-sm font-medium text-muted-foreground">
+                      Telefon {requiredStar}
+                    </Label>
+                    <PhoneDigitsInput
+                      id="phone-nem"
+                      className={phoneInputWrapperClass}
+                      inputClassName="placeholder:text-muted-foreground"
+                      value={form.watch("phoneDigits")}
+                      onChange={(v) => form.setValue("phoneDigits", v, { shouldValidate: true })}
+                      onBlur={() => form.trigger("phoneDigits")}
+                      aria-invalid={Boolean(form.formState.errors.phoneDigits)}
+                      aria-describedby={form.formState.errors.phoneDigits ? "phone-nem-error" : undefined}
+                    />
+                    {form.formState.errors.phoneDigits && (
+                      <p id="phone-nem-error" className="mt-1 text-sm text-red-600">
+                        {form.formState.errors.phoneDigits.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="email-nem" className="text-sm font-medium text-muted-foreground">
+                    E-mail {requiredStar}
+                  </Label>
+                  <Input
+                    id="email-nem"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="zadejte.vas@email.cz"
+                    className="bg-secondary border-border h-11 text-sm"
+                    aria-invalid={Boolean(form.formState.errors.email)}
+                    aria-describedby={form.formState.errors.email ? "email-nem-error" : undefined}
+                    {...form.register("email")}
                   />
-                </SliderTouchLock>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{formatRangeLabel(CAR_RANGE.min)}</span>
-                  <span>{formatRangeLabel(CAR_RANGE.max)}</span>
+                  {form.formState.errors.email && (
+                    <p id="email-nem-error" className="mt-1 text-sm text-red-600">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
                 </div>
-              </>
-            )}
-          </div>
+              </TabsContent>
 
-          <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
-            <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-            <span className="text-[11px] text-muted-foreground">
-              {socialProofText}
-            </span>
-          </div>
+              <TabsContent value="car" className="mt-0 space-y-4 outline-none">
+                <div className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-amber-50 px-3 py-1.5 shadow-sm">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/70 opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white/80" />
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">
+                    Konzultanti k dispozici • Ozveme se brzy
+                  </span>
+                </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="name" className="text-sm font-medium text-muted-foreground">
-                Jméno a příjmení
-              </Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Jan Novák"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-secondary border-border h-11 text-sm"
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="phone" className="text-sm font-medium text-muted-foreground">
-                Telefon
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+420 111 111 111"
-                value={formatPhoneDisplay(phoneDigits)}
-                onChange={(e) => setPhoneDigits(parsePhoneDigits(e.target.value))}
-                className="bg-secondary border-border h-11 text-sm"
-                required
-              />
-            </div>
-          </div>
+                <div className="space-y-1">
+                  <Label htmlFor="vehicle-model" className="text-sm font-medium text-muted-foreground">
+                    Značka a model vozu {requiredStar}
+                  </Label>
+                  <Input
+                    id="vehicle-model"
+                    className="bg-secondary border-border h-11 text-sm"
+                    aria-invalid={Boolean(form.formState.errors.vehicleModel)}
+                    aria-describedby={form.formState.errors.vehicleModel ? "vehicle-model-error" : undefined}
+                    {...form.register("vehicleModel")}
+                  />
+                  <p className="text-xs text-muted-foreground">Např. Škoda Fabia</p>
+                  {form.formState.errors.vehicleModel && (
+                    <p id="vehicle-model-error" className="mt-1 text-sm text-red-600">
+                      {form.formState.errors.vehicleModel.message}
+                    </p>
+                  )}
+                </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">
-              E-mail
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="zadejte.vas@email.cz"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-secondary border-border h-11 text-sm"
-            />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="vehicle-year" className="text-sm font-medium text-muted-foreground">
+                      Rok výroby {requiredStar}
+                    </Label>
+                    <Input
+                      id="vehicle-year"
+                      inputMode="numeric"
+                      className="bg-secondary border-border h-11 text-sm"
+                      aria-invalid={Boolean(form.formState.errors.year)}
+                      aria-describedby={form.formState.errors.year ? "vehicle-year-error" : undefined}
+                      {...form.register("year")}
+                    />
+                    <p className="text-xs text-muted-foreground">Např. 2019</p>
+                    {form.formState.errors.year && (
+                      <p id="vehicle-year-error" className="mt-1 text-sm text-red-600">
+                        {form.formState.errors.year.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="vehicle-km" className="text-sm font-medium text-muted-foreground">
+                      Počet najetých kilometrů {requiredStar}
+                    </Label>
+                    <Input
+                      id="vehicle-km"
+                      inputMode="numeric"
+                      className="bg-secondary border-border h-11 text-sm"
+                      aria-invalid={Boolean(form.formState.errors.mileage)}
+                      aria-describedby={form.formState.errors.mileage ? "vehicle-km-error" : undefined}
+                      {...form.register("mileage")}
+                    />
+                    <p className="text-xs text-muted-foreground">Např. 142 000 km</p>
+                    {form.formState.errors.mileage && (
+                      <p id="vehicle-km-error" className="mt-1 text-sm text-red-600">
+                        {form.formState.errors.mileage.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="vehicle-vin" className="text-sm font-medium text-muted-foreground">
+                    VIN (nepovinné)
+                  </Label>
+                  <Input id="vehicle-vin" className="bg-secondary border-border h-11 text-sm" {...form.register("vin")} />
+                  <p className="text-xs text-muted-foreground">Např. TMBJF7CN0S123456</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-muted-foreground">Požadovaná částka</Label>
+                    <span className="text-base font-bold text-primary">
+                      {formatAmount(snapToCarValue(vehicleAmountCzk))}
+                    </span>
+                  </div>
+                  <SliderTouchLock
+                    minIndex={0}
+                    maxIndex={maxIdxCar}
+                    valueIndex={valueIndexCar}
+                    onValueChange={(i) =>
+                      form.setValue("vehicleAmountCzk", CAR_AMOUNT_VALUES[i], { shouldValidate: true })
+                    }
+                  >
+                    <Slider
+                      value={[valueIndexCar]}
+                      onValueChange={([i]) =>
+                        form.setValue("vehicleAmountCzk", CAR_AMOUNT_VALUES[i], { shouldValidate: true })
+                      }
+                      min={0}
+                      max={maxIdxCar}
+                      step={1}
+                      className="w-full"
+                    />
+                  </SliderTouchLock>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{formatRangeLabel(CAR_RANGE.min)}</span>
+                    <span>{formatRangeLabel(CAR_RANGE.max)}</span>
+                  </div>
+                  <Controller
+                    name="vehicleAmountCzk"
+                    control={form.control}
+                    render={({ field }) => <input type="hidden" {...field} value={field.value} readOnly />}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 py-2 px-3 rounded-lg border border-primary/20 bg-amber-50/90">
+                  <TrendingUp className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                  <span className="text-[11px] font-medium leading-snug text-foreground">{socialProofText}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="first-name" className="text-sm font-medium text-muted-foreground">
+                      Jméno {requiredStar}
+                    </Label>
+                    <Input
+                      id="first-name"
+                      autoComplete="given-name"
+                      className="bg-secondary border-border h-11 text-sm"
+                      aria-invalid={Boolean(form.formState.errors.firstName)}
+                      aria-describedby={form.formState.errors.firstName ? "first-name-error" : undefined}
+                      {...form.register("firstName")}
+                    />
+                    {form.formState.errors.firstName && (
+                      <p id="first-name-error" className="mt-1 text-sm text-red-600">
+                        {form.formState.errors.firstName.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="last-name" className="text-sm font-medium text-muted-foreground">
+                      Příjmení {requiredStar}
+                    </Label>
+                    <Input
+                      id="last-name"
+                      autoComplete="family-name"
+                      className="bg-secondary border-border h-11 text-sm"
+                      aria-invalid={Boolean(form.formState.errors.lastName)}
+                      aria-describedby={form.formState.errors.lastName ? "last-name-error" : undefined}
+                      {...form.register("lastName")}
+                    />
+                    {form.formState.errors.lastName && (
+                      <p id="last-name-error" className="mt-1 text-sm text-red-600">
+                        {form.formState.errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="phone-voz" className="text-sm font-medium text-muted-foreground">
+                    Telefonní číslo {requiredStar}
+                  </Label>
+                  <PhoneDigitsInput
+                    id="phone-voz"
+                    className={phoneInputWrapperClass}
+                    inputClassName="placeholder:text-muted-foreground"
+                    value={form.watch("phoneDigits")}
+                    onChange={(v) => form.setValue("phoneDigits", v, { shouldValidate: true })}
+                    onBlur={() => form.trigger("phoneDigits")}
+                    aria-invalid={Boolean(form.formState.errors.phoneDigits)}
+                    aria-describedby={form.formState.errors.phoneDigits ? "phone-voz-error" : undefined}
+                  />
+                  {form.formState.errors.phoneDigits && (
+                    <p id="phone-voz-error" className="mt-1 text-sm text-red-600">
+                      {form.formState.errors.phoneDigits.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="email-voz" className="text-sm font-medium text-muted-foreground">
+                    E-mail {requiredStar}
+                  </Label>
+                  <Input
+                    id="email-voz"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="zadejte.vas@email.cz"
+                    className="bg-secondary border-border h-11 text-sm"
+                    aria-invalid={Boolean(form.formState.errors.email)}
+                    aria-describedby={form.formState.errors.email ? "email-voz-error" : undefined}
+                    {...form.register("email")}
+                  />
+                  {form.formState.errors.email && (
+                    <p id="email-voz-error" className="mt-1 text-sm text-red-600">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
 
           <p className="text-xs text-muted-foreground">
@@ -435,14 +798,6 @@ export function LoanCalculator() {
             .
           </p>
 
-          {submitStatus === "success" && (
-            <p className="text-sm font-medium text-green-600 text-center">Děkujeme. Brzy vás budeme kontaktovat.</p>
-          )}
-          {submitStatus === "error" && (
-            <p className="text-sm font-medium text-destructive text-center">
-              Odeslání se nepovedlo. Zkuste to znovu nebo nám zavolejte.
-            </p>
-          )}
           <Button
             type="submit"
             size="lg"

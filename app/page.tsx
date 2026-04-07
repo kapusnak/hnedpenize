@@ -9,7 +9,7 @@ export default function Home() {
     {
       icon: Zap,
       title: "Peníze do 24 hodin",
-      description: "Díky vlastnímu kapitálu vyplácíme okamžitě po podpisu.",
+      description: "Finance vyplácíme okamžitě po podpisu.",
     },
     {
       icon: HomeIcon,

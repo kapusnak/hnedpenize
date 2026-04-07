@@ -31,10 +31,22 @@ function formatAmountCzk(value: number): string {
   return `${withSpaces},- Kč`
 }
 
+function formatEmailJsError(err: unknown): string {
+  if (err && typeof err === "object") {
+    const o = err as Record<string, unknown>
+    if (typeof o.text === "string" && o.text.trim()) return o.text.trim()
+    if (typeof o.message === "string" && o.message.trim()) return o.message.trim()
+  }
+  if (err instanceof Error && err.message) return err.message
+  return String(err)
+}
+
 export async function sendLead(params: LeadParams): Promise<void> {
   if (!PUBLIC_KEY || !SERVICE_ID || !TEMPLATE_ID) {
-    console.warn("EmailJS not configured: set NEXT_PUBLIC_EMAILJS_PUBLIC_KEY, SERVICE_ID, TEMPLATE_ID")
-    return
+    const detail =
+      "Chybí NEXT_PUBLIC_EMAILJS_PUBLIC_KEY, NEXT_PUBLIC_EMAILJS_SERVICE_ID nebo NEXT_PUBLIC_EMAILJS_TEMPLATE_ID. U statického exportu musí být nastavené před `npm run build` (nejen na serveru po buildu)."
+    console.error("[EmailJS]", detail)
+    throw new Error(detail)
   }
   const isCallbackOnly = params.source === "cta" || params.source === "popup"
   const assetTypeValue = isCallbackOnly ? PLACEHOLDER : (params.assetType ?? "")
@@ -55,7 +67,16 @@ export async function sendLead(params: LeadParams): Promise<void> {
           ? CALLBACK_ONLY_AMOUNT
           : "",
   }
-  await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, { publicKey: PUBLIC_KEY })
+  try {
+    await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, { publicKey: PUBLIC_KEY })
+  } catch (err) {
+    console.error("[EmailJS] Hlavní šablona (lead):", formatEmailJsError(err), err)
+    throw new Error(`Odeslání poptávky selhalo: ${formatEmailJsError(err)}`)
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.info("[EmailJS] Hlavní šablona odeslána OK (template:", TEMPLATE_ID + ")")
+  }
 
   trackLeadGenerated({
     source: params.source,
@@ -89,8 +110,17 @@ export async function sendLead(params: LeadParams): Promise<void> {
       propertyType: assetTypeValue,
       serviceType: isCallbackOnly ? CALLBACK_ONLY_SERVICE : (params.serviceType ?? ""),
     }
-    emailjs
-      .send(SERVICE_ID, CLIENT_TEMPLATE_ID, clientParams, { publicKey: PUBLIC_KEY })
-      .catch((err) => console.warn("Client confirmation email failed:", err))
+    try {
+      await emailjs.send(SERVICE_ID, CLIENT_TEMPLATE_ID, clientParams, { publicKey: PUBLIC_KEY })
+      if (process.env.NODE_ENV === "development") {
+        console.info("[EmailJS] Klientská šablona odeslána OK (template:", CLIENT_TEMPLATE_ID + ")")
+      }
+    } catch (err) {
+      console.warn(
+        "[EmailJS] Klientské potvrzení se nepovedlo (poptávka už mohla dorazit vám):",
+        formatEmailJsError(err),
+        err,
+      )
+    }
   }
 }

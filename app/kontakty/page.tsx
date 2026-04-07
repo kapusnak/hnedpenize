@@ -124,7 +124,6 @@ export default function KontaktyPage() {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    sandbox="allow-scripts"
                   />
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">

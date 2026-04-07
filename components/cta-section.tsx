@@ -4,6 +4,8 @@ import type React from "react"
 
 import { useState } from "react"
 import { usePathname } from "next/navigation"
+import { toast } from "sonner"
+
 import { sendLead } from "@/lib/emailjs"
 import { formatPhoneDisplay, parsePhoneDigits, toFullPhone } from "@/lib/phone-420"
 import { Phone } from "lucide-react"
@@ -19,15 +21,33 @@ export function CtaSection() {
     e.preventDefault()
     const fullPhone = toFullPhone(phoneDigits)
     if (!fullPhone) {
-      setSubmitStatus("error")
+      toast.error("Zadejte platné telefonní číslo (9 číslic).", {
+        id: "lead-phone-invalid",
+        duration: 6500,
+      })
       return
     }
     setSubmitStatus("sending")
     try {
       await sendLead({ source: "cta", phone: fullPhone, pagePath: pathname })
       setSubmitStatus("success")
-    } catch {
+      toast.success("Děkujeme za poptávku", {
+        id: "lead-cta-success",
+        description: "Brzy vás budeme kontaktovat. Zkontrolujte prosím i složku s nevyžádanou poštou.",
+        duration: 5000,
+      })
+    } catch (e) {
       setSubmitStatus("error")
+      const hint = e instanceof Error ? e.message.trim() : ""
+      const description =
+        hint.length > 0 && hint.length <= 220
+          ? hint
+          : "Zkuste to prosím znovu nebo nás kontaktujte telefonicky. Podrobnosti jsou v konzoli prohlížeče (F12)."
+      toast.error("Odeslání se nepovedlo", {
+        id: "lead-cta-error",
+        description,
+        duration: 9000,
+      })
     }
   }
 
@@ -38,11 +58,6 @@ export function CtaSection() {
         Nechte nám kontakt, obratem se Vám ozveme a nezávazně vše prokonzultujeme.
       </p>
 
-      {(submitStatus === "success" || submitStatus === "error") && (
-        <p className={`font-medium text-center mb-4 ${submitStatus === "success" ? "text-primary-foreground" : "text-red-200"}`}>
-          {submitStatus === "success" ? "Děkujeme, brzy vás budeme kontaktovat." : "Odeslání se nepovedlo. Zkuste to znovu."}
-        </p>
-      )}
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
         <div className="relative flex-1">
           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
