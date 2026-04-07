@@ -529,7 +529,6 @@ export function LoanCalculator() {
                       id="name"
                       type="text"
                       autoComplete="name"
-                      placeholder="Jan Novák"
                       className="bg-secondary border-border h-11 text-sm"
                       aria-invalid={Boolean(form.formState.errors.name)}
                       aria-describedby={form.formState.errors.name ? "name-error" : undefined}
@@ -571,7 +570,6 @@ export function LoanCalculator() {
                     id="email-nem"
                     type="email"
                     autoComplete="email"
-                    placeholder="zadejte.vas@email.cz"
                     className="bg-secondary border-border h-11 text-sm"
                     aria-invalid={Boolean(form.formState.errors.email)}
                     aria-describedby={form.formState.errors.email ? "email-nem-error" : undefined}
@@ -586,16 +584,6 @@ export function LoanCalculator() {
               </TabsContent>
 
               <TabsContent value="car" className="mt-0 space-y-4 outline-none">
-                <div className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-amber-50 px-3 py-1.5 shadow-sm">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/70 opacity-75" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white/80" />
-                  </span>
-                  <span className="text-xs font-semibold text-foreground">
-                    Konzultanti k dispozici • Ozveme se brzy
-                  </span>
-                </div>
-
                 <div className="space-y-1">
                   <Label htmlFor="vehicle-model" className="text-sm font-medium text-muted-foreground">
                     Značka a model vozu {requiredStar}
@@ -701,9 +689,9 @@ export function LoanCalculator() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2 py-2 px-3 rounded-lg border border-primary/20 bg-amber-50/90">
-                  <TrendingUp className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                  <span className="text-[11px] font-medium leading-snug text-foreground">{socialProofText}</span>
+                <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
+                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span className="text-[11px] text-muted-foreground">{socialProofText}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -774,7 +762,6 @@ export function LoanCalculator() {
                     id="email-voz"
                     type="email"
                     autoComplete="email"
-                    placeholder="zadejte.vas@email.cz"
                     className="bg-secondary border-border h-11 text-sm"
                     aria-invalid={Boolean(form.formState.errors.email)}
                     aria-describedby={form.formState.errors.email ? "email-voz-error" : undefined}
@@ -804,12 +791,7 @@ export function LoanCalculator() {
             disabled={submitStatus === "sending"}
             className="w-full text-sm sm:text-base font-semibold h-auto min-h-12 py-3 px-4 bg-gold hover:bg-gold/90 text-gold-foreground rounded-lg active:scale-[0.98] transition-transform text-balance"
           >
-            {submitStatus === "sending" ? "Odesílám…" : submitStatus === "success" ? "Odesláno" : (
-              <>
-                <span className="block sm:hidden">Získat nabídku přednostně</span>
-                <span className="hidden sm:block">Získat nezávaznou nabídku</span>
-              </>
-            )}
+            {submitStatus === "sending" ? "Odesílám…" : submitStatus === "success" ? "Odesláno" : "Odeslat nezávaznou poptávku"}
           </Button>
 
           <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
