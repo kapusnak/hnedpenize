@@ -18,7 +18,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PhoneDigitsInput } from "@/components/phone-digits-input"
-import { Building2, Car, Lock, TrendingUp } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Building2, Car, Check, Loader2, Lock, TrendingUp } from "lucide-react"
 
 const LOCK_THRESHOLD_PX = 10
 
@@ -347,6 +348,7 @@ export function LoanCalculator() {
   const valueIndexCar = carAmountToIndex(vehicleAmountCzk)
 
   const onSubmit = async (values: CalculatorFormValues) => {
+    if (submitStatus === "success") return
     const phone = toFullPhone(values.phoneDigits)
     if (!phone) return
     setSubmitStatus("sending")
@@ -788,10 +790,28 @@ export function LoanCalculator() {
           <Button
             type="submit"
             size="lg"
-            disabled={submitStatus === "sending"}
-            className="w-full text-sm sm:text-base font-semibold h-auto min-h-12 py-3 px-4 bg-gold hover:bg-gold/90 text-gold-foreground rounded-lg active:scale-[0.98] transition-transform text-balance"
+            disabled={submitStatus === "sending" || submitStatus === "success"}
+            aria-busy={submitStatus === "sending"}
+            className={cn(
+              "w-full text-sm sm:text-base font-semibold h-auto min-h-12 py-3 px-4 rounded-lg text-balance transition-all disabled:pointer-events-none flex items-center justify-center gap-2",
+              submitStatus === "success"
+                ? "border-2 border-primary/20 bg-primary/10 text-primary shadow-none hover:bg-primary/10"
+                : "bg-gold hover:bg-gold/90 text-gold-foreground active:scale-[0.98] disabled:opacity-65",
+            )}
           >
-            {submitStatus === "sending" ? "Odesílám…" : submitStatus === "success" ? "Odesláno" : "Odeslat nezávaznou poptávku"}
+            {submitStatus === "sending" ? (
+              <>
+                <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden />
+                Odesílám…
+              </>
+            ) : submitStatus === "success" ? (
+              <>
+                <Check className="h-5 w-5 shrink-0 stroke-[2.5]" aria-hidden />
+                Poptávka odeslána
+              </>
+            ) : (
+              "Odeslat nezávaznou poptávku"
+            )}
           </Button>
 
           <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">

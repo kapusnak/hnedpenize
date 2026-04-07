@@ -133,7 +133,6 @@ export function LeadPopup() {
                 onChange={setPhoneDigits}
                 autoComplete="off"
                 name="phone"
-                placeholder="111 111 111"
                 aria-label="Telefonní číslo (9 číslic bez předvolby)"
               />
             </div>
