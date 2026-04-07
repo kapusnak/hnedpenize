@@ -292,6 +292,8 @@ export function LoanCalculator() {
     resolver: zodResolver(calculatorSchema),
     defaultValues,
     mode: "onSubmit",
+    /** Avoid re-running full Zod superRefine on every keystroke / slider move (default is onChange). */
+    reValidateMode: "onSubmit",
   })
 
   const assetMode = form.watch("assetMode")
@@ -490,13 +492,13 @@ export function LoanCalculator() {
                     maxIndex={maxIdxRe}
                     valueIndex={valueIndexRe}
                     onValueChange={(i) =>
-                      form.setValue("amountCzk", REAL_ESTATE_AMOUNT_VALUES[i], { shouldValidate: true })
+                      form.setValue("amountCzk", REAL_ESTATE_AMOUNT_VALUES[i])
                     }
                   >
                     <Slider
                       value={[valueIndexRe]}
                       onValueChange={([i]) =>
-                        form.setValue("amountCzk", REAL_ESTATE_AMOUNT_VALUES[i], { shouldValidate: true })
+                        form.setValue("amountCzk", REAL_ESTATE_AMOUNT_VALUES[i])
                       }
                       min={0}
                       max={maxIdxRe}
@@ -663,13 +665,13 @@ export function LoanCalculator() {
                     maxIndex={maxIdxCar}
                     valueIndex={valueIndexCar}
                     onValueChange={(i) =>
-                      form.setValue("vehicleAmountCzk", CAR_AMOUNT_VALUES[i], { shouldValidate: true })
+                      form.setValue("vehicleAmountCzk", CAR_AMOUNT_VALUES[i])
                     }
                   >
                     <Slider
                       value={[valueIndexCar]}
                       onValueChange={([i]) =>
-                        form.setValue("vehicleAmountCzk", CAR_AMOUNT_VALUES[i], { shouldValidate: true })
+                        form.setValue("vehicleAmountCzk", CAR_AMOUNT_VALUES[i])
                       }
                       min={0}
                       max={maxIdxCar}
