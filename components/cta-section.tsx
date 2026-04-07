@@ -7,9 +7,9 @@ import { usePathname } from "next/navigation"
 import { toast } from "sonner"
 
 import { sendLead } from "@/lib/emailjs"
-import { formatPhoneDisplay, parsePhoneDigits, toFullPhone } from "@/lib/phone-420"
+import { toFullPhone } from "@/lib/phone-420"
+import { PhoneDigitsInput } from "@/components/phone-digits-input"
 import { Phone } from "lucide-react"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 export function CtaSection() {
@@ -59,14 +59,18 @@ export function CtaSection() {
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-        <div className="relative flex-1">
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            type="tel"
-            placeholder="+420 111 111 111"
-            value={formatPhoneDisplay(phoneDigits)}
-            onChange={(e) => setPhoneDigits(parsePhoneDigits(e.target.value))}
-            className="pl-10 h-12 md:h-14 bg-card border-0 text-foreground placeholder:text-muted-foreground"
+        <div className="flex flex-1 min-w-0 h-12 md:h-14 items-center gap-2 rounded-md bg-card pl-3 pr-4 text-foreground focus-within:ring-2 focus-within:ring-ring/50 focus-within:ring-offset-2 focus-within:ring-offset-background">
+          <Phone className="w-5 h-5 shrink-0 text-muted-foreground" aria-hidden />
+          <PhoneDigitsInput
+            className="min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none h-full"
+            inputClassName="text-foreground placeholder:text-muted-foreground"
+            prefixClassName="text-muted-foreground"
+            value={phoneDigits}
+            onChange={setPhoneDigits}
+            autoComplete="off"
+            name="phone"
+            placeholder="111 111 111"
+            aria-label="Telefonní číslo (9 číslic bez předvolby)"
           />
         </div>
         <Button

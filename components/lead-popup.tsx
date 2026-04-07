@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation"
 import { toast } from "sonner"
 
 import { sendLead } from "@/lib/emailjs"
-import { formatPhoneDisplay, parsePhoneDigits, toFullPhone } from "@/lib/phone-420"
+import { toFullPhone } from "@/lib/phone-420"
+import { PhoneDigitsInput } from "@/components/phone-digits-input"
 import { X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -121,16 +122,19 @@ export function LeadPopup() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-2 lg:gap-3">
-            {/* Phone input */}
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="tel"
-                placeholder="+420 111 111 111"
-                value={formatPhoneDisplay(phoneDigits)}
-                onChange={(e) => setPhoneDigits(parsePhoneDigits(e.target.value))}
-                className="w-full h-10 lg:h-12 pl-10 pr-4 rounded-lg bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
-                required
+            {/* National digits only; +420 is fixed — avoids caret-before-prefix and stray 420 digits in state */}
+            <div className="flex h-10 lg:h-12 w-full items-center gap-2 rounded-lg bg-white pl-3 pr-4 text-foreground focus-within:ring-2 focus-within:ring-gold focus-within:ring-offset-0 focus-within:ring-offset-transparent">
+              <Phone className="w-4 h-4 shrink-0 text-muted-foreground" aria-hidden />
+              <PhoneDigitsInput
+                className="min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none h-full"
+                inputClassName="text-foreground placeholder:text-muted-foreground"
+                prefixClassName="text-muted-foreground"
+                value={phoneDigits}
+                onChange={setPhoneDigits}
+                autoComplete="off"
+                name="phone"
+                placeholder="111 111 111"
+                aria-label="Telefonní číslo (9 číslic bez předvolby)"
               />
             </div>
 

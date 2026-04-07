@@ -31,13 +31,13 @@ function formatAmountCzk(value: number): string {
   return `${withSpaces},- Kč`
 }
 
-/** Value for EmailJS `{{source}}` — public URL only (not calculator/popup/cta; GA still uses `params.source`). */
-function formatOdeslanoZPublicUrl(): string {
+/** Value for EmailJS `{{source}}` — public site URL only (no label prefix; GA still uses `params.source`). */
+function leadEmailSourceUrl(): string {
   const origin =
     typeof window !== "undefined" && window.location?.origin
       ? window.location.origin
       : (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/$/, "")
-  return origin ? `Odesláno z: ${origin}` : "Odesláno z: —"
+  return origin || "—"
 }
 
 function formatEmailJsError(err: unknown): string {
@@ -60,7 +60,7 @@ export async function sendLead(params: LeadParams): Promise<void> {
   const isCallbackOnly = params.source === "cta" || params.source === "popup"
   const assetTypeValue = isCallbackOnly ? PLACEHOLDER : (params.assetType ?? "")
   const templateParams = {
-    source: formatOdeslanoZPublicUrl(),
+    source: leadEmailSourceUrl(),
     phone: params.phone,
     email: params.email ?? "",
     name: isCallbackOnly ? PLACEHOLDER : (params.name ?? ""),

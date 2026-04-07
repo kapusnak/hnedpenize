@@ -549,8 +549,7 @@ export function LoanCalculator() {
                       className={phoneInputWrapperClass}
                       inputClassName="placeholder:text-muted-foreground"
                       value={form.watch("phoneDigits")}
-                      onChange={(v) => form.setValue("phoneDigits", v, { shouldValidate: true })}
-                      onBlur={() => form.trigger("phoneDigits")}
+                      onChange={(v) => form.setValue("phoneDigits", v)}
                       aria-invalid={Boolean(form.formState.errors.phoneDigits)}
                       aria-describedby={form.formState.errors.phoneDigits ? "phone-nem-error" : undefined}
                     />
@@ -742,8 +741,7 @@ export function LoanCalculator() {
                     className={phoneInputWrapperClass}
                     inputClassName="placeholder:text-muted-foreground"
                     value={form.watch("phoneDigits")}
-                    onChange={(v) => form.setValue("phoneDigits", v, { shouldValidate: true })}
-                    onBlur={() => form.trigger("phoneDigits")}
+                    onChange={(v) => form.setValue("phoneDigits", v)}
                     aria-invalid={Boolean(form.formState.errors.phoneDigits)}
                     aria-describedby={form.formState.errors.phoneDigits ? "phone-voz-error" : undefined}
                   />
