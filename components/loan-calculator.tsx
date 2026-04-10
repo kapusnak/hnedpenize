@@ -300,6 +300,10 @@ export function LoanCalculator() {
   const assetMode = form.watch("assetMode")
   const amountCzk = form.watch("amountCzk")
   const vehicleAmountCzk = form.watch("vehicleAmountCzk")
+  const privacyPolicyHref =
+    assetMode === "real-estate"
+      ? "/ochrana-osobnich-udaju/nemovitosti"
+      : "/ochrana-osobnich-udaju/vozidla"
 
   const switchAssetMode = useCallback(
     (mode: "real-estate" | "car") => {
@@ -781,7 +785,7 @@ export function LoanCalculator() {
 
           <p className="text-xs text-muted-foreground">
             Odesláním poptávky souhlasíte s naším{" "}
-            <Link href="/ochrana-osobnich-udaju" className="text-primary hover:underline">
+            <Link href={privacyPolicyHref} className="text-primary hover:underline">
               Prohlášením o ochraně osobních údajů
             </Link>
             .

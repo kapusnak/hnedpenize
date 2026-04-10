@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { toast } from "sonner"
 
@@ -80,6 +81,13 @@ export function CtaSection() {
           {submitStatus === "sending" ? "Odesílám…" : submitStatus === "success" ? "Odesláno" : "Zavolejte mi zdarma"}
         </Button>
       </form>
+      <p className="text-sm text-primary-foreground/80 mt-4 max-w-md mx-auto">
+        Zadáním svého telefonního čísla souhlasíte s naším{" "}
+        <Link href="/ochrana-osobnich-udaju" className="text-primary-foreground underline underline-offset-2 hover:opacity-90">
+          Prohlášením o ochraně osobních údajů
+        </Link>
+        .
+      </p>
     </div>
   )
 }

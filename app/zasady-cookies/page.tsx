@@ -180,8 +180,10 @@ export default function ZasadyCookiesPage() {
               Pro uplatnění těchto práv nás prosím kontaktujte. Kontaktní údaje najdete ve spodní části těchto Zásad
               používání souborů cookies. Máte-li stížnost na to, jak nakládáme s vašimi údaji, rádi bychom se o tom
               dozvěděli, ale máte také právo podat stížnost kontrolnímu orgánu (Úřadu pro ochranu osobních údajů).
-              Více informací o zpracování osobních údajů naleznete v našem prohlášení{" "}
-              <Link href="/ochrana-osobnich-udaju" className="text-primary no-underline hover:underline">Ochrana osobních údajů</Link>.
+              Více informací o zpracování osobních údajů naleznete v prohlášeních{" "}
+              <Link href="/ochrana-osobnich-udaju/nemovitosti" className="text-primary no-underline hover:underline">Ochrana osobních údajů - Nemovitosti</Link>{" "}
+              a{" "}
+              <Link href="/ochrana-osobnich-udaju/vozidla" className="text-primary no-underline hover:underline">Ochrana osobních údajů - Vozidla</Link>.
             </p>
 
             <h2 id="kontakt" className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">
@@ -217,11 +219,18 @@ export default function ZasadyCookiesPage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
             <Link
-              href="/ochrana-osobnich-udaju"
+              href="/ochrana-osobnich-udaju/nemovitosti"
               className="hover:text-primary transition-colors flex items-center gap-2"
             >
               <FileText className="w-4 h-4" />
-              Ochrana osobních údajů
+              Ochrana osobních údajů - Nemovitosti
+            </Link>
+            <Link
+              href="/ochrana-osobnich-udaju/vozidla"
+              className="hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Ochrana osobních údajů - Vozidla
             </Link>
             <Link
               href="/zasady-cookies"
@@ -232,7 +241,7 @@ export default function ZasadyCookiesPage() {
             </Link>
           </div>
           <p className="text-center text-xs text-muted-foreground mt-6">
-            © 2025 Dočasný výkup s.r.o. Všechna práva vyhrazena.
+            © 2026 Dočasný výkup s.r.o. Všechna práva vyhrazena.
           </p>
         </div>
       </footer>

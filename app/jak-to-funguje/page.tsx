@@ -50,9 +50,13 @@ export default function HowItWorksPage() {
       <footer className="py-8 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
-            <Link href="/ochrana-osobnich-udaju" className="hover:text-primary transition-colors flex items-center gap-2">
+            <Link href="/ochrana-osobnich-udaju/nemovitosti" className="hover:text-primary transition-colors flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Ochrana osobních údajů
+              Ochrana osobních údajů - Nemovitosti
+            </Link>
+            <Link href="/ochrana-osobnich-udaju/vozidla" className="hover:text-primary transition-colors flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Ochrana osobních údajů - Vozidla
             </Link>
             <Link href="/zasady-cookies" className="hover:text-primary transition-colors flex items-center gap-2">
               <Cookie className="w-4 h-4" />
@@ -60,7 +64,7 @@ export default function HowItWorksPage() {
             </Link>
           </div>
           <p className="text-center text-xs text-muted-foreground mt-6">
-            © 2025 Dočasný výkup s.r.o. Všechna práva vyhrazena.
+            © 2026 Dočasný výkup s.r.o. Všechna práva vyhrazena.
           </p>
         </div>
       </footer>
