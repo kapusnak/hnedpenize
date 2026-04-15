@@ -200,6 +200,7 @@ const calculatorSchema = z
     year: z.string(),
     mileage: z.string(),
     vin: z.string(),
+    contractDurationMonths: z.string(),
     vehicleAmountCzk: z.number(),
   })
   .superRefine((data, ctx) => {
@@ -240,6 +241,25 @@ const calculatorSchema = z
       if (data.vehicleAmountCzk < CAR_RANGE.min || data.vehicleAmountCzk > CAR_RANGE.max) {
         ctx.addIssue({ code: "custom", message: "Neplatná částka.", path: ["vehicleAmountCzk"] })
       }
+      const contractMonths = data.contractDurationMonths.trim()
+      if (contractMonths.length > 0) {
+        if (!/^\d+$/.test(contractMonths)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "Zadejte počet měsíců jako celé číslo.",
+            path: ["contractDurationMonths"],
+          })
+        } else {
+          const n = Number.parseInt(contractMonths, 10)
+          if (n < 1 || n > 360) {
+            ctx.addIssue({
+              code: "custom",
+              message: "Zadejte počet měsíců v rozmezí 1–360.",
+              path: ["contractDurationMonths"],
+            })
+          }
+        }
+      }
     }
   })
 
@@ -247,7 +267,14 @@ type CalculatorFormValues = z.infer<typeof calculatorSchema>
 
 function emptyCarFields(): Pick<
   CalculatorFormValues,
-  "firstName" | "lastName" | "vehicleModel" | "year" | "mileage" | "vin" | "vehicleAmountCzk"
+  | "firstName"
+  | "lastName"
+  | "vehicleModel"
+  | "year"
+  | "mileage"
+  | "vin"
+  | "contractDurationMonths"
+  | "vehicleAmountCzk"
 > {
   return {
     firstName: "",
@@ -256,6 +283,7 @@ function emptyCarFields(): Pick<
     year: "",
     mileage: "",
     vin: "",
+    contractDurationMonths: "",
     vehicleAmountCzk: snapToCarValue(DEFAULT_CAR_AMOUNT),
   }
 }
@@ -372,7 +400,10 @@ export function LoanCalculator() {
         amount = snapToCarValue(values.vehicleAmountCzk)
         assetType = "Automobil"
         const vinPart = values.vin.trim() ? `, VIN ${values.vin.trim()}` : ""
-        serviceType = `Peníze ihned a jezděte dál — ${values.vehicleModel.trim()}, r.v. ${values.year.trim()}, ${values.mileage.trim()} km${vinPart}`
+        const contractPart = values.contractDurationMonths.trim()
+          ? `, trvání smlouvy ${values.contractDurationMonths.trim()} měs.`
+          : ""
+        serviceType = `Peníze ihned a jezděte dál — ${values.vehicleModel.trim()}, r.v. ${values.year.trim()}, ${values.mileage.trim()} km${vinPart}${contractPart}`
       }
       await sendLead({
         source: "calculator",
@@ -694,6 +725,29 @@ export function LoanCalculator() {
                     control={form.control}
                     render={({ field }) => <input type="hidden" {...field} value={field.value} readOnly />}
                   />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="contract-duration-months" className="text-sm font-medium text-muted-foreground">
+                    Trvání smlouvy (měsíce)
+                  </Label>
+                  <Input
+                    id="contract-duration-months"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    className="bg-secondary border-border h-11 text-sm"
+                    aria-invalid={Boolean(form.formState.errors.contractDurationMonths)}
+                    aria-describedby={
+                      form.formState.errors.contractDurationMonths ? "contract-duration-months-error" : undefined
+                    }
+                    {...form.register("contractDurationMonths")}
+                  />
+                  <p className="text-xs text-muted-foreground">Např. 24</p>
+                  {form.formState.errors.contractDurationMonths && (
+                    <p id="contract-duration-months-error" className="mt-1 text-sm text-red-600">
+                      {form.formState.errors.contractDurationMonths.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">

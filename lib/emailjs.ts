@@ -44,6 +44,31 @@ function leadEmailSourceUrl(): string {
   return cleaned || "—"
 }
 
+/**
+ * Compact E.164-style number for `tel:` links (no spaces).
+ * `+420 728 020 048` → `+420728020048`
+ */
+function normalizePhoneForTel(phone: string): string {
+  const trimmed = phone.trim()
+  if (!trimmed) return ""
+  const digits = trimmed.replace(/\D/g, "")
+  if (digits.length === 12 && digits.startsWith("420")) return `+${digits}`
+  if (digits.length === 9) return `+420${digits}`
+  return trimmed.replace(/\s/g, "")
+}
+
+/** e.g. `+420728020048` → `+420 728 020 048` for readable e-mail body */
+function formatPhoneDisplayForNotification(phone: string): string {
+  const trimmed = phone.trim()
+  if (!trimmed) return ""
+  let digits = trimmed.replace(/\D/g, "")
+  if (digits.length >= 11 && digits.startsWith("420")) digits = digits.slice(3)
+  const national = digits.slice(0, 9)
+  if (national.length !== 9) return trimmed
+  const groups = national.match(/.{1,3}/g)?.join(" ") ?? national
+  return `+420 ${groups}`
+}
+
 function formatEmailJsError(err: unknown): string {
   if (err && typeof err === "object") {
     const o = err as Record<string, unknown>
@@ -63,9 +88,11 @@ export async function sendLead(params: LeadParams): Promise<void> {
   }
   const isCallbackOnly = params.source === "cta" || params.source === "popup"
   const assetTypeValue = isCallbackOnly ? PLACEHOLDER : (params.assetType ?? "")
+  const phoneTel = normalizePhoneForTel(params.phone)
   const templateParams = {
     source: leadEmailSourceUrl(),
-    phone: params.phone,
+    phone: phoneTel || params.phone.trim(),
+    phoneDisplay: formatPhoneDisplayForNotification(params.phone),
     email: params.email ?? "",
     name: isCallbackOnly ? PLACEHOLDER : (params.name ?? ""),
     assetType: assetTypeValue,
@@ -110,7 +137,7 @@ export async function sendLead(params: LeadParams): Promise<void> {
       to_email: clientEmail,
       client_email: clientEmail,
       name: isCallbackOnly ? "" : (params.name ?? ""),
-      phone: params.phone,
+      phone: phoneTel || params.phone.trim(),
       amount:
         params.amount != null
           ? formatAmountCzk(params.amount)

@@ -48,6 +48,7 @@ export default function OchranaOsobnichUdajuVozidlaPage() {
               <li>Počet najetých kilometrů</li>
               <li>VIN (nepovinné)</li>
               <li>Požadovaná částka</li>
+              <li>Trvání smlouvy (měsíce)</li>
             </ul>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">3. Jak vaše údaje získáváme</h2>
