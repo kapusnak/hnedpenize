@@ -727,6 +727,11 @@ export function LoanCalculator() {
                   />
                 </div>
 
+                <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
+                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span className="text-[11px] text-muted-foreground">{socialProofText}</span>
+                </div>
+
                 <div className="space-y-1">
                   <Label htmlFor="contract-duration-months" className="text-sm font-medium text-muted-foreground">
                     Trvání smlouvy (měsíce)
@@ -748,11 +753,6 @@ export function LoanCalculator() {
                       {form.formState.errors.contractDurationMonths.message}
                     </p>
                   )}
-                </div>
-
-                <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
-                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                  <span className="text-[11px] text-muted-foreground">{socialProofText}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
