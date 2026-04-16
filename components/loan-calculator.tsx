@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PhoneDigitsInput } from "@/components/phone-digits-input"
 import { cn } from "@/lib/utils"
-import { Building2, Car, Check, Loader2, Lock, TrendingUp } from "lucide-react"
+import { Building2, Car, Check, Loader2, Lock } from "lucide-react"
 
 const LOCK_THRESHOLD_PX = 10
 
@@ -172,18 +172,6 @@ const realEstateServices = [
 const DEFAULT_REAL_ESTATE_AMOUNT = 2000000
 const DEFAULT_CAR_AMOUNT = 100000
 
-function randomSocialProofAmount(min: number, max: number): string {
-  const value = min + Math.random() * (max - min)
-  return value.toFixed(1).replace(/\.0$/, "")
-}
-
-function getSocialProofText(): string {
-  const amount = randomSocialProofAmount(2.1, 23)
-  return `Za posledních 30 dní vyplaceno již ${amount} mil. Kč. Průměrná doba vyřízení: 24h.`
-}
-
-const SOCIAL_PROOF_FALLBACK = "Za posledních 30 dní vyplaceno již 3.9 mil. Kč. Průměrná doba vyřízení: 24h."
-
 const serviceTypeEnum = z.enum(["zpetny-leasing", "zastava", "primy-vykup", "bez-zajisteni"])
 
 const calculatorSchema = z
@@ -302,12 +290,7 @@ const phoneInputWrapperClass =
 const requiredStar = <span className="text-red-600">*</span>
 
 export function LoanCalculator() {
-  const [socialProofText, setSocialProofText] = useState(SOCIAL_PROOF_FALLBACK)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
-
-  useEffect(() => {
-    setSocialProofText(getSocialProofText())
-  }, [])
 
   const defaultValues: CalculatorFormValues = {
     assetMode: "real-estate",
@@ -554,11 +537,6 @@ export function LoanCalculator() {
                   />
                 </div>
 
-                <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
-                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                  <span className="text-[11px] text-muted-foreground">{socialProofText}</span>
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label htmlFor="name" className="text-sm font-medium text-muted-foreground">
@@ -725,11 +703,6 @@ export function LoanCalculator() {
                     control={form.control}
                     render={({ field }) => <input type="hidden" {...field} value={field.value} readOnly />}
                   />
-                </div>
-
-                <div className="flex items-center gap-2 py-2 px-3 bg-muted/50 rounded-lg">
-                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                  <span className="text-[11px] text-muted-foreground">{socialProofText}</span>
                 </div>
 
                 <div className="space-y-1">
