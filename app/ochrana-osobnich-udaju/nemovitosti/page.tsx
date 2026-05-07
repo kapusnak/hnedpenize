@@ -18,7 +18,7 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
             Prohlášení o ochraně osobních údajů - nemovitosti
           </h1>
-          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 10. dubna 2026</p>
+          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 7. května 2026</p>
         </div>
       </section>
 

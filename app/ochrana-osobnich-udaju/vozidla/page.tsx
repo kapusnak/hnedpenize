@@ -18,7 +18,7 @@ export default function OchranaOsobnichUdajuVozidlaPage() {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
             Prohlášení o ochraně osobních údajů - vozidla
           </h1>
-          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 10. dubna 2026</p>
+          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 7. května 2026</p>
         </div>
       </section>
 
@@ -78,16 +78,18 @@ export default function OchranaOsobnichUdajuVozidlaPage() {
               5. Předání osobních údajů třetím stranám
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
-              V rámci zpracování poptávek zajištěných vozidlem mohou být údaje předány smluvnímu partnerovi:
+              Pro účely posouzení poptávky, přípravy nabídky a zprostředkování služeb zajištěných vozidlem můžeme vaše
+              osobní údaje předat <strong className="text-foreground">smluvním partnerům</strong> (příjemcům údajů),
+              se kterými spolupracujeme. Jedná se zejména o podnikatele působící v oblasti služeb souvisejících s
+              vozidly a zajištěným financováním (např. posouzení vozidla, příprava smluvní dokumentace, komunikace ohledně
+              nabídky). Konkrétní identitu příjemce vám v případě předání údajů obvykle sdělíme v rámci komunikace ohledně
+              vaší poptávky; na vyžádání vám ji sdělíme i předem.
             </p>
-            <p className="font-semibold text-foreground mb-2">Car Service Partner s.r.o.</p>
-            <ul className="list-none pl-0 text-base text-muted-foreground leading-relaxed space-y-1 mb-6">
-              <li>Sídlo: Na Poříčí 1071/17, Nové Město, 110 00 Praha 1</li>
-              <li>IČ: 06143911</li>
-              <li>E-mail: info@cash4car.cz</li>
-            </ul>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
-              Údaje nejsou dále poskytovány jiným třetím osobám, s výjimkou případů, kdy to ukládá zákon.
+              Kromě výše uvedeného mohou být údaje předány také poskytovatelům technických a provozních služeb
+              (typicky zpracovatelé), kteří pro nás zajišťují např. hosting či provoz webových nástrojů v rozsahu
+              nutném pro výkon smlouvy nebo náš oprávněný zájem; podrobnosti o některých nástrojích obsahuje část o
+              cookies níže. Údaje dále předáváme jen tehdy, když nám to ukládá zákon nebo rozhodnutí veřejné moci.
             </p>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">6. Doba uchování údajů</h2>
