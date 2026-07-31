@@ -16,6 +16,8 @@ export type LeadParams = {
   amount?: number
   assetType?: string
   serviceType?: string
+  /** Adresa nemovitosti – pouze u poptávek na nemovitost; v EmailJS šabloně použijte {{propertyAddress}} */
+  propertyAddress?: string
   /** Current path for GA (e.g. /kontakty); set for popup/cta phone leads */
   pagePath?: string
 }
@@ -88,6 +90,9 @@ export async function sendLead(params: LeadParams): Promise<void> {
   }
   const isCallbackOnly = params.source === "cta" || params.source === "popup"
   const assetTypeValue = isCallbackOnly ? PLACEHOLDER : (params.assetType ?? "")
+  const propertyAddressValue = isCallbackOnly
+    ? PLACEHOLDER
+    : (params.propertyAddress?.trim() ?? "")
   const phoneTel = normalizePhoneForTel(params.phone)
   const templateParams = {
     source: leadEmailSourceUrl(),
@@ -100,6 +105,9 @@ export async function sendLead(params: LeadParams): Promise<void> {
     collateralType: assetTypeValue,
     propertyType: assetTypeValue,
     serviceType: isCallbackOnly ? CALLBACK_ONLY_SERVICE : (params.serviceType ?? ""),
+    propertyAddress: propertyAddressValue,
+    /** Alias if EmailJS dashboard template uses {{address}} */
+    address: propertyAddressValue,
     amount:
       params.amount != null
         ? formatAmountCzk(params.amount)
@@ -149,6 +157,8 @@ export async function sendLead(params: LeadParams): Promise<void> {
       /** Used in client template as "Typ zajištění" (Nemovitost / Automobil) */
       propertyType: assetTypeValue,
       serviceType: isCallbackOnly ? CALLBACK_ONLY_SERVICE : (params.serviceType ?? ""),
+      propertyAddress: isCallbackOnly ? "" : propertyAddressValue,
+      address: isCallbackOnly ? "" : propertyAddressValue,
     }
     try {
       await emailjs.send(SERVICE_ID, CLIENT_TEMPLATE_ID, clientParams, { publicKey: PUBLIC_KEY })

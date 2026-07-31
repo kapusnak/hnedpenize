@@ -47,6 +47,7 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
               <li>Jméno a příjmení</li>
               <li>E-mailová adresa</li>
               <li>Telefonní číslo</li>
+              <li>Adresa nemovitosti</li>
               <li>Typ služby (např. Zpětný leasing, Zástava nemovitosti, Přímý výkup, Bez zajištění)</li>
               <li>Požadovaná částka</li>
             </ul>

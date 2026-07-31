@@ -180,6 +180,7 @@ const calculatorSchema = z
     name: z.string(),
     email: z.string(),
     phoneDigits: z.string(),
+    propertyAddress: z.string(),
     serviceType: serviceTypeEnum,
     amountCzk: z.number(),
     firstName: z.string(),
@@ -206,6 +207,13 @@ const calculatorSchema = z
     if (data.assetMode === "real-estate") {
       if (data.name.trim().length < 2) {
         ctx.addIssue({ code: "custom", message: "Zadejte jméno.", path: ["name"] })
+      }
+      if (data.propertyAddress.trim().length < 5) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Zadejte adresu nemovitosti (ulice, č.p., město).",
+          path: ["propertyAddress"],
+        })
       }
       if (data.amountCzk < REAL_ESTATE_RANGE.min || data.amountCzk > REAL_ESTATE_RANGE.max) {
         ctx.addIssue({ code: "custom", message: "Neplatná částka.", path: ["amountCzk"] })
@@ -276,9 +284,13 @@ function emptyCarFields(): Pick<
   }
 }
 
-function emptyRealEstateFields(): Pick<CalculatorFormValues, "name" | "serviceType" | "amountCzk"> {
+function emptyRealEstateFields(): Pick<
+  CalculatorFormValues,
+  "name" | "propertyAddress" | "serviceType" | "amountCzk"
+> {
   return {
     name: "",
+    propertyAddress: "",
     serviceType: "zpetny-leasing",
     amountCzk: snapToRealEstateValue(DEFAULT_REAL_ESTATE_AMOUNT),
   }
@@ -372,12 +384,14 @@ export function LoanCalculator() {
       let amount: number
       let assetType: string
       let serviceType: string
+      let propertyAddress: string | undefined
       if (values.assetMode === "real-estate") {
         name = values.name.trim()
         amount = snapToRealEstateValue(values.amountCzk)
         assetType = "Nemovitost"
         serviceType =
           realEstateServices.find((s) => s.value === values.serviceType)?.label ?? values.serviceType
+        propertyAddress = values.propertyAddress.trim()
       } else {
         name = `${values.firstName.trim()} ${values.lastName.trim()}`.trim()
         amount = snapToCarValue(values.vehicleAmountCzk)
@@ -396,6 +410,7 @@ export function LoanCalculator() {
         amount,
         assetType,
         serviceType,
+        ...(propertyAddress ? { propertyAddress } : {}),
       })
       setSubmitStatus("success")
       toast.success("Děkujeme za poptávku", {
@@ -576,6 +591,29 @@ export function LoanCalculator() {
                       </p>
                     )}
                   </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="property-address" className="text-sm font-medium text-muted-foreground">
+                    Adresa nemovitosti {requiredStar}
+                  </Label>
+                  <Input
+                    id="property-address"
+                    type="text"
+                    autoComplete="street-address"
+                    placeholder="Ulice a č.p., město"
+                    className="bg-secondary border-border h-11 text-sm"
+                    aria-invalid={Boolean(form.formState.errors.propertyAddress)}
+                    aria-describedby={
+                      form.formState.errors.propertyAddress ? "property-address-error" : undefined
+                    }
+                    {...form.register("propertyAddress")}
+                  />
+                  {form.formState.errors.propertyAddress && (
+                    <p id="property-address-error" className="mt-1 text-sm text-red-600">
+                      {form.formState.errors.propertyAddress.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1">
