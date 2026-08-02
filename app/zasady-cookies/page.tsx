@@ -204,7 +204,7 @@ export default function ZasadyCookiesPage() {
                 </a>
               </li>
               <li>
-                E-mail: <a href="mailto:info@docasnyvykup.cz" className="text-primary no-underline hover:underline">info@docasnyvykup.cz</a>
+                E-mail: <a href="mailto:info@hnedpenize.cz" className="text-primary no-underline hover:underline">info@hnedpenize.cz</a>
               </li>
               <li>Phone: +420 777 400 256</li>
             </ul>

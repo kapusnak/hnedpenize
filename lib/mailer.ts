@@ -11,6 +11,25 @@ function requireEnv(name: string): string {
   return value
 }
 
+/** Hostname for From display name, e.g. hnedpenize.cz (not local-part "info"). */
+function fromDisplayDomain(smtpUser: string): string {
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim()
+  if (origin) {
+    try {
+      const host = new URL(origin.includes("://") ? origin : `https://${origin}`).hostname.replace(
+        /^www\./,
+        "",
+      )
+      if (host) return host
+    } catch {
+      /* fall through */
+    }
+  }
+  const at = smtpUser.lastIndexOf("@")
+  if (at > 0 && at < smtpUser.length - 1) return smtpUser.slice(at + 1)
+  return smtpUser
+}
+
 /** Lazy Nodemailer transport — created on first send, not at import/build time. */
 export function getMailer(): Transporter {
   if (transporter) return transporter
@@ -34,10 +53,16 @@ export function getMailer(): Transporter {
   return transporter
 }
 
+/**
+ * From header. Prefer MAIL_FROM; otherwise `"domain" <SMTP_USER>` so inboxes
+ * show e.g. hnedpenize.cz instead of just "info".
+ */
 export function mailFromAddress(): string {
   const from = process.env.MAIL_FROM?.trim()
   if (from) return from
-  return requireEnv("SMTP_USER")
+  const user = requireEnv("SMTP_USER")
+  const domain = fromDisplayDomain(user)
+  return `"${domain}" <${user}>`
 }
 
 export function leadNotifyTo(): string {

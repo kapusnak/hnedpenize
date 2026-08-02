@@ -60,7 +60,7 @@ export default function KontaktyPage() {
 
                 {/* Email */}
                 <a
-                  href="mailto:info@docasnyvykup.cz"
+                  href="mailto:info@hnedpenize.cz"
                   className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
                 >
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -68,7 +68,7 @@ export default function KontaktyPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Napište nám</p>
-                    <p className="text-lg font-semibold text-primary group-hover:underline">info@docasnyvykup.cz</p>
+                    <p className="text-lg font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
                   </div>
                 </a>
 

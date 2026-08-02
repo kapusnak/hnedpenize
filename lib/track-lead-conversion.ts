@@ -7,7 +7,7 @@ export const GA_EVENT_FORMULAR = "vyplneny_formular"
 /** Phone-only: popup, CTA on Kontakty / Jak to funguje. */
 export const GA_EVENT_TELEFON = "telefonni_cislo"
 
-/** Matches `LeadParams["source"]` in lib/emailjs.ts (client lead submit) — kept local to avoid circular imports. */
+/** Matches lead form `source` values — kept local to avoid circular imports. */
 export type LeadSource = "calculator" | "popup" | "cta"
 
 /**

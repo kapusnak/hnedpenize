@@ -129,7 +129,7 @@ export default function Home() {
                   </a>
 
                   <a
-                    href="mailto:info@docasnyvykup.cz"
+                    href="mailto:info@hnedpenize.cz"
                     className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mb-3 group"
                   >
                     <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -137,7 +137,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Napište nám</p>
-                      <p className="text-sm font-semibold text-primary group-hover:underline">info@docasnyvykup.cz</p>
+                      <p className="text-sm font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
                     </div>
                   </a>
 

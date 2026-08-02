@@ -27,7 +27,7 @@ Nastavte hodnoty podle `.env.example`:
 - `SMTP_USER` — `info@hnedpenize.cz`
 - `SMTP_PASS` — heslo schránky
 - `LEAD_NOTIFY_TO` — kam chodí notifikace o poptávkách (typicky `info@hnedpenize.cz`)
-- volitelně `MAIL_FROM` (např. `Hnedpenize <info@hnedpenize.cz>`)
+- volitelně `MAIL_FROM` (např. `hnedpenize.cz <info@hnedpenize.cz>` — bez ní se jako jméno odesílatele použije doména)
 
 **Veřejné (klient):**
 

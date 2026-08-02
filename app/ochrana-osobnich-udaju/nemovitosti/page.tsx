@@ -136,8 +136,8 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
             <ul className="list-none pl-0 text-base text-muted-foreground leading-relaxed space-y-2">
               <li>+420 777 400 256</li>
               <li>
-                <a href="mailto:info@docasnyvykup.cz" className="text-primary no-underline hover:underline">
-                  info@docasnyvykup.cz
+                <a href="mailto:info@hnedpenize.cz" className="text-primary no-underline hover:underline">
+                  info@hnedpenize.cz
                 </a>
               </li>
               <li>Podvesná VII/6192, 760 01 Zlín</li>

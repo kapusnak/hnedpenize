@@ -12,6 +12,18 @@ export type LeadPayload = {
   pagePath?: string
 }
 
+/** Brand + contact used in operator/client e-mails for this site. */
+const SITE = {
+  domain: "hnedpenize.cz",
+  brandName: "Hnedpenize.cz",
+  contactEmail: "info@hnedpenize.cz",
+  signOff: "Váš tým Dočasný výkup s.r.o. (Hnedpenize.cz)",
+  phones: [
+    { tel: "+420776075150", display: "+420 776 075 150" },
+    { tel: "+420777400256", display: "+420 777 400 256" },
+  ],
+} as const
+
 const CALLBACK_ONLY_SERVICE = "Není relevantní (Callback)"
 const CALLBACK_ONLY_AMOUNT = "--- Pouze požadavek na zavolání ---"
 const PLACEHOLDER = "---"
@@ -62,6 +74,23 @@ function leadSourceUrl(): string {
   return cleaned || "—"
 }
 
+/** Hostname for notify subject, e.g. `[hnedpenize.cz]`. */
+function notifyDomainTag(): string {
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim()
+  if (origin) {
+    try {
+      const host = new URL(origin.includes("://") ? origin : `https://${origin}`).hostname.replace(
+        /^www\./,
+        "",
+      )
+      if (host) return host
+    } catch {
+      /* fall through */
+    }
+  }
+  return SITE.domain
+}
+
 function isCallbackOnly(source: LeadSource): boolean {
   return source === "cta" || source === "popup"
 }
@@ -78,7 +107,7 @@ export type BuiltLeadEmails = {
   phoneDisplay: string
 }
 
-/** Operator notification — layout from former EmailJS lead template + IP row. */
+/** Operator notification HTML. */
 function buildNotifyHtml(fields: {
   source: string
   name: string
@@ -156,13 +185,21 @@ function buildNotifyHtml(fields: {
 </div>`.trim()
 }
 
-/** Client confirmation — layout from former EmailJS client template. */
+/** Client confirmation HTML — footer uses this site's brand. */
 function buildClientHtml(fields: {
   name: string
   propertyType: string
   serviceType: string
   amount: string
 }): string {
+  const phoneLines = SITE.phones
+    .map(
+      (p) =>
+        `<a style="color: #1a5a9c; text-decoration: none;" href="tel:${escapeHtml(p.tel)}">${escapeHtml(p.display)}</a>`,
+    )
+    .join("<br>\n      ")
+  const contactEmail = SITE.contactEmail
+
   return `
 <div style="font-family: system-ui, sans-serif, Arial; font-size: 14px; color: #333333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background-color: #ffffff;">
   <div style="color: #1a5a9c; font-size: 20px; font-weight: bold; margin-bottom: 20px; border-bottom: 2px solid #1a5a9c; padding-bottom: 10px;">Dobrý den, děkujeme za Vaši poptávku!</div>
@@ -205,15 +242,14 @@ function buildClientHtml(fields: {
   <div style="margin-top: 30px; padding-top: 15px; border-top: 1px dashed #cccccc;">
     <h4 style="margin-bottom: 10px; font-size: 15px; color: #1a5a9c;">Spěcháte, nebo máte dotazy?</h4>
     <p style="margin: 5px 0;">📞 Telefon:<br>
-      <a style="color: #1a5a9c; text-decoration: none;" href="tel:+420776075150">+420 776 075 150</a><br>
-      <a style="color: #1a5a9c; text-decoration: none;" href="tel:+420777400256">+420 777 400 256</a>
+      ${phoneLines}
     </p>
-    <p style="margin: 5px 0;">📧 E-mail: <a style="color: #1a5a9c; text-decoration: none;" href="mailto:info@hnedpenize.cz">info@hnedpenize.cz</a></p>
+    <p style="margin: 5px 0;">📧 E-mail: <a style="color: #1a5a9c; text-decoration: none;" href="mailto:${escapeHtml(contactEmail)}">${escapeHtml(contactEmail)}</a></p>
   </div>
   <div style="margin-top: 30px;">
     <p style="margin: 0;">Těšíme se na spolupráci!</p>
     <p style="margin: 5px 0 0 0;">S pozdravem,</p>
-    <p style="margin: 0; font-weight: bold; color: #1a5a9c;">Váš tým Dočasný výkup s.r.o. (Hnedpenize.cz)</p>
+    <p style="margin: 0; font-weight: bold; color: #1a5a9c;">${escapeHtml(SITE.signOff)}</p>
   </div>
 </div>`.trim()
 }
@@ -237,10 +273,12 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
   const ip = params.ip.trim() || "neznámá"
   const pagePath = params.pagePath?.trim() || ""
   const sourceDisplay = pagePath ? `${sourceUrl}${pagePath}` : sourceUrl
+  const domainTag = notifyDomainTag()
 
-  const notifySubject = callback
+  const notifySubjectCore = callback
     ? `Callback – ${phoneDisplay}`
     : `Nová poptávka – ${name !== PLACEHOLDER ? name : phoneDisplay}`
+  const notifySubject = `[${domainTag}] ${notifySubjectCore}`
 
   const notifyText = [
     `Zdroj: ${sourceDisplay}`,
@@ -268,7 +306,8 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
   })
 
   const clientNameForBody = callback ? PLACEHOLDER : name
-  const clientSubject = "Potvrzení přijetí poptávky – Hnedpenize.cz"
+  const clientSubject = `Potvrzení přijetí poptávky – ${SITE.brandName}`
+  const phonesText = SITE.phones.map((p) => p.display).join(" / ")
   const clientText = [
     "Dobrý den, děkujeme za Vaši poptávku!",
     "",
@@ -281,11 +320,11 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
     "",
     "Obvykle se Vám ozveme do 30 minut v pracovní době (Po–Pá: 8:00 – 18:00).",
     "",
-    "Telefon: +420 776 075 150 / +420 777 400 256",
-    "E-mail: info@hnedpenize.cz",
+    `Telefon: ${phonesText}`,
+    `E-mail: ${SITE.contactEmail}`,
     "",
     "S pozdravem,",
-    "Váš tým Dočasný výkup s.r.o. (Hnedpenize.cz)",
+    SITE.signOff,
   ].join("\n")
 
   const clientHtml = buildClientHtml({

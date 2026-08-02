@@ -130,8 +130,8 @@ export default function OchranaOsobnichUdajuVozidlaPage() {
               <li>Zdeněk Kapušňák, IČ: 67020283</li>
               <li>Podvesná VII/2046, 760 01 Zlín</li>
               <li>
-                <a href="mailto:info@docasnyvykup.cz" className="text-primary no-underline hover:underline">
-                  info@docasnyvykup.cz
+                <a href="mailto:info@hnedpenize.cz" className="text-primary no-underline hover:underline">
+                  info@hnedpenize.cz
                 </a>
               </li>
               <li>+420 777 400 256</li>
