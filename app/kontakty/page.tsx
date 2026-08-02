@@ -2,6 +2,7 @@ import { Header } from "@/components/header"
 import { Phone, Mail, Clock, MapPin, Building2, FileText, Cookie } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/cta-section"
+import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import Link from "next/link"
 
 export default function KontaktyPage() {
@@ -77,6 +78,10 @@ export default function KontaktyPage() {
                   <p className="text-muted-foreground">
                     <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
                   </p>
+                </div>
+
+                <div className="mt-6">
+                  <ZivefirmyBadge variant="light" />
                 </div>
               </CardContent>
             </Card>

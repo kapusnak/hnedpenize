@@ -1,18 +1,18 @@
 # Půjčka formulář — hnedpenize
 
-Static marketing site for **Dočasný výkup s.r.o.** (reverse leasing, asset-backed financing). Built with Next.js and deployed as a **static export** via FTP to Wedos.
+Marketingový web pro **Dočasný výkup s.r.o.** (zpětný leasing, zajištěné financování). Next.js na **Railway** se Spacemail SMTP pro poptávky.
 
 ## Overview
 
 - **Stack:** Next.js 16 (App Router), React 19, Tailwind CSS
-- **Deployment:** Static build (`output: 'export'`) → upload `out/` via FTP to Wedos. No Node.js on the server.
-- **Analytics:** Google Tag Manager + Google Analytics (optional, via env vars)
-- **Forms:** EmailJS (browser-side; no backend required)
+- **Deployment:** Railway (Nixpacks) — `npm run build` + `next start`
+- **Analytics:** Google Tag Manager + Google Analytics (volitelně přes env)
+- **Forms:** `POST /api/lead` → Nodemailer / Spacemail (notifikace včetně IP)
 
-## Build and deploy
+## Build a deploy
 
-1. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_*` variables (EmailJS, GTM, GA, site URL).
-2. Run `npm install` and `npm run build`.
-3. Upload the **contents** of the `out/` folder to your Wedos hosting via FTP.
+1. Zkopírujte `.env.example` do `.env.local` a nastavte SMTP + `NEXT_PUBLIC_*`.
+2. `npm install` a `npm run build` / `npm start`.
+3. Na Railway nastavte Variables podle `.env.example`.
 
-See **DEPLOYMENT.md** for detailed steps (env vars, FTP upload, optional `.htaccess`).
+Viz **DEPLOY.md** (Node 20, Spacemail, DNS ALIAS, smoke test).

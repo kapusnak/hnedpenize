@@ -49,6 +49,10 @@ export default function OchranaOsobnichUdajuVozidlaPage() {
               <li>VIN (nepovinné)</li>
               <li>Požadovaná částka</li>
               <li>Trvání smlouvy (měsíce)</li>
+              <li>
+                IP adresa (technický údaj při odeslání formuláře – bezpečnost a prevence zneužití, na základě oprávněného
+                zájmu dle čl. 6 odst. 1 písm. f) GDPR)
+              </li>
             </ul>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">3. Jak vaše údaje získáváme</h2>

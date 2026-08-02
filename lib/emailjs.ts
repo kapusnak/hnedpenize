@@ -1,12 +1,4 @@
-import emailjs from "@emailjs/browser"
-
 import { trackLeadGenerated } from "@/lib/track-lead-conversion"
-
-const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
-const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
-const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-/** Client confirmation template ("Klientská - potvrzení přijetí poptávky") – used when sending success email to the client */
-const CLIENT_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_CLIENT_TEMPLATE_ID ?? "template_3t8h00d"
 
 export type LeadParams = {
   source: "calculator" | "popup" | "cta"
@@ -16,114 +8,39 @@ export type LeadParams = {
   amount?: number
   assetType?: string
   serviceType?: string
-  /** Adresa nemovitosti – pouze u poptávek na nemovitost; v EmailJS šabloně použijte {{propertyAddress}} */
+  /** Adresa nemovitosti – pouze u poptávek na nemovitost */
   propertyAddress?: string
   /** Current path for GA (e.g. /kontakty); set for popup/cta phone leads */
   pagePath?: string
 }
 
-const CALLBACK_ONLY_SERVICE = "Není relevantní (Callback)"
-const CALLBACK_ONLY_AMOUNT = "--- Pouze požadavek na zavolání ---"
-const PLACEHOLDER = "---"
-
-/** Format amount for email: "1 800 000,- Kč" */
-function formatAmountCzk(value: number): string {
-  const integer = Math.round(value)
-  const withSpaces = integer.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-  return `${withSpaces},- Kč`
-}
-
-/**
- * Value for EmailJS `{{source}}` — public site URL only (e.g. `https://hnedpenize.cz`).
- * The template should use the “Zdroj:” label; do not prefix here. Strips a mistaken `Odesláno z:` from env.
- */
-function leadEmailSourceUrl(): string {
-  const origin =
-    typeof window !== "undefined" && window.location?.origin
-      ? window.location.origin
-      : (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/$/, "")
-  const cleaned = (origin || "—").replace(/^Odesláno z:\s*/i, "").trim()
-  return cleaned || "—"
-}
-
-/**
- * Compact E.164-style number for `tel:` links (no spaces).
- * `+420 728 020 048` → `+420728020048`
- */
-function normalizePhoneForTel(phone: string): string {
-  const trimmed = phone.trim()
-  if (!trimmed) return ""
-  const digits = trimmed.replace(/\D/g, "")
-  if (digits.length === 12 && digits.startsWith("420")) return `+${digits}`
-  if (digits.length === 9) return `+420${digits}`
-  return trimmed.replace(/\s/g, "")
-}
-
-/** e.g. `+420728020048` → `+420 728 020 048` for readable e-mail body */
-function formatPhoneDisplayForNotification(phone: string): string {
-  const trimmed = phone.trim()
-  if (!trimmed) return ""
-  let digits = trimmed.replace(/\D/g, "")
-  if (digits.length >= 11 && digits.startsWith("420")) digits = digits.slice(3)
-  const national = digits.slice(0, 9)
-  if (national.length !== 9) return trimmed
-  const groups = national.match(/.{1,3}/g)?.join(" ") ?? national
-  return `+420 ${groups}`
-}
-
-function formatEmailJsError(err: unknown): string {
-  if (err && typeof err === "object") {
-    const o = err as Record<string, unknown>
-    if (typeof o.text === "string" && o.text.trim()) return o.text.trim()
-    if (typeof o.message === "string" && o.message.trim()) return o.message.trim()
-  }
-  if (err instanceof Error && err.message) return err.message
-  return String(err)
-}
-
 export async function sendLead(params: LeadParams): Promise<void> {
-  if (!PUBLIC_KEY || !SERVICE_ID || !TEMPLATE_ID) {
-    const detail =
-      "Chybí NEXT_PUBLIC_EMAILJS_PUBLIC_KEY, NEXT_PUBLIC_EMAILJS_SERVICE_ID nebo NEXT_PUBLIC_EMAILJS_TEMPLATE_ID. U statického exportu musí být nastavené před `npm run build` (nejen na serveru po buildu)."
-    console.error("[EmailJS]", detail)
-    throw new Error(detail)
-  }
-  const isCallbackOnly = params.source === "cta" || params.source === "popup"
-  const assetTypeValue = isCallbackOnly ? PLACEHOLDER : (params.assetType ?? "")
-  const propertyAddressValue = isCallbackOnly
-    ? PLACEHOLDER
-    : (params.propertyAddress?.trim() ?? "")
-  const phoneTel = normalizePhoneForTel(params.phone)
-  const templateParams = {
-    source: leadEmailSourceUrl(),
-    phone: phoneTel || params.phone.trim(),
-    phoneDisplay: formatPhoneDisplayForNotification(params.phone),
-    email: params.email ?? "",
-    name: isCallbackOnly ? PLACEHOLDER : (params.name ?? ""),
-    assetType: assetTypeValue,
-    /** Alias for EmailJS templates that show "Typ zajištění" (Nemovitost / Automobil) */
-    collateralType: assetTypeValue,
-    propertyType: assetTypeValue,
-    serviceType: isCallbackOnly ? CALLBACK_ONLY_SERVICE : (params.serviceType ?? ""),
-    propertyAddress: propertyAddressValue,
-    /** Alias if EmailJS dashboard template uses {{address}} */
-    address: propertyAddressValue,
-    amount:
-      params.amount != null
-        ? formatAmountCzk(params.amount)
-        : isCallbackOnly
-          ? CALLBACK_ONLY_AMOUNT
-          : "",
-  }
-  try {
-    await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, { publicKey: PUBLIC_KEY })
-  } catch (err) {
-    console.error("[EmailJS] Hlavní šablona (lead):", formatEmailJsError(err), err)
-    throw new Error(`Odeslání poptávky selhalo: ${formatEmailJsError(err)}`)
-  }
+  const res = await fetch("/api/lead", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      source: params.source,
+      phone: params.phone,
+      ...(params.email != null ? { email: params.email } : {}),
+      ...(params.name != null ? { name: params.name } : {}),
+      ...(params.amount != null ? { amount: params.amount } : {}),
+      ...(params.assetType != null ? { assetType: params.assetType } : {}),
+      ...(params.serviceType != null ? { serviceType: params.serviceType } : {}),
+      ...(params.propertyAddress != null ? { propertyAddress: params.propertyAddress } : {}),
+      ...(params.pagePath != null ? { pagePath: params.pagePath } : {}),
+    }),
+  })
 
-  if (process.env.NODE_ENV === "development") {
-    console.info("[EmailJS] Hlavní šablona odeslána OK (template:", TEMPLATE_ID + ")")
+  if (!res.ok) {
+    let detail = `HTTP ${res.status}`
+    try {
+      const data = (await res.json()) as { error?: string }
+      if (data.error?.trim()) detail = data.error.trim()
+    } catch {
+      /* ignore */
+    }
+    console.error("[lead]", detail)
+    throw new Error(`Odeslání poptávky selhalo: ${detail}`)
   }
 
   trackLeadGenerated({
@@ -135,42 +52,9 @@ export async function sendLead(params: LeadParams): Promise<void> {
       ? { leadValue: params.amount }
       : {}),
   })
+}
 
-  // Send client success/confirmation email when we have the client's email (e.g. from calculator form).
-  // EmailJS template template_3t8h00d uses "To Email" = {{email}}, so we must pass `email`.
-  const clientEmail = (params.email ?? "").trim()
-  if (clientEmail && PUBLIC_KEY && SERVICE_ID && CLIENT_TEMPLATE_ID) {
-    const clientParams = {
-      email: clientEmail,
-      to_email: clientEmail,
-      client_email: clientEmail,
-      name: isCallbackOnly ? "" : (params.name ?? ""),
-      phone: phoneTel || params.phone.trim(),
-      amount:
-        params.amount != null
-          ? formatAmountCzk(params.amount)
-          : isCallbackOnly
-            ? CALLBACK_ONLY_AMOUNT
-            : "",
-      assetType: assetTypeValue,
-      collateralType: assetTypeValue,
-      /** Used in client template as "Typ zajištění" (Nemovitost / Automobil) */
-      propertyType: assetTypeValue,
-      serviceType: isCallbackOnly ? CALLBACK_ONLY_SERVICE : (params.serviceType ?? ""),
-      propertyAddress: isCallbackOnly ? "" : propertyAddressValue,
-      address: isCallbackOnly ? "" : propertyAddressValue,
-    }
-    try {
-      await emailjs.send(SERVICE_ID, CLIENT_TEMPLATE_ID, clientParams, { publicKey: PUBLIC_KEY })
-      if (process.env.NODE_ENV === "development") {
-        console.info("[EmailJS] Klientská šablona odeslána OK (template:", CLIENT_TEMPLATE_ID + ")")
-      }
-    } catch (err) {
-      console.warn(
-        "[EmailJS] Klientské potvrzení se nepovedlo (poptávka už mohla dorazit vám):",
-        formatEmailJsError(err),
-        err,
-      )
-    }
-  }
+/** Rohový popup – pouze telefon. */
+export async function sendPopupPhone(phone: string, pagePath?: string): Promise<void> {
+  await sendLead({ source: "popup", phone, pagePath })
 }

@@ -1,6 +1,7 @@
 import { Header } from "@/components/header"
 import { LoanCalculator } from "@/components/loan-calculator"
 import { LeadPopup } from "@/components/lead-popup"
+import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock } from "lucide-react"
 
@@ -145,6 +146,10 @@ export default function Home() {
                     <p className="text-muted-foreground text-sm">
                       <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
                     </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <ZivefirmyBadge variant="light" />
                   </div>
                 </CardContent>
               </Card>

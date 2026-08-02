@@ -50,6 +50,10 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
               <li>Adresa nemovitosti</li>
               <li>Typ služby (např. Zpětný leasing, Zástava nemovitosti, Přímý výkup, Bez zajištění)</li>
               <li>Požadovaná částka</li>
+              <li>
+                IP adresa (technický údaj při odeslání formuláře – bezpečnost a prevence zneužití, na základě oprávněného
+                zájmu dle čl. 6 odst. 1 písm. f) GDPR)
+              </li>
             </ul>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">3. Jak vaše údaje získáváme</h2>
