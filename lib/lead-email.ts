@@ -70,7 +70,10 @@ function escapeHtml(value: string): string {
 
 function leadSourceUrl(): string {
   const origin = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/$/, "")
-  const cleaned = (origin || "—").replace(/^Odesláno z:\s*/i, "").trim()
+  const cleaned = (origin || "—")
+    .replace(/^Odesláno z:\s*/i, "")
+    .replace(/^https?:\/\//i, "")
+    .trim()
   return cleaned || "—"
 }
 
@@ -157,6 +160,10 @@ function buildNotifyHtml(fields: {
           <td style="padding: 5px 0; text-align: right;">${emailCell}</td>
         </tr>
         <tr>
+          <td style="padding: 5px 0;"><strong>IP adresa:</strong></td>
+          <td style="padding: 5px 0; text-align: right; font-weight: 500;">${escapeHtml(fields.ip)}</td>
+        </tr>
+        <tr>
           <td colspan="2" style="padding: 5px 0; border-top: 1px dashed #cccccc;"></td>
         </tr>
         <tr>
@@ -170,10 +177,6 @@ function buildNotifyHtml(fields: {
         <tr>
           <td style="padding: 5px 0;"><strong>Požadovaná služba:</strong></td>
           <td style="padding: 5px 0; text-align: right; font-weight: 500;">${escapeHtml(fields.serviceType)}</td>
-        </tr>
-        <tr>
-          <td style="padding: 5px 0;"><strong>IP adresa:</strong></td>
-          <td style="padding: 5px 0; text-align: right; font-weight: 500;">${escapeHtml(fields.ip)}</td>
         </tr>
       </tbody>
     </table>
@@ -285,11 +288,11 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
     `Jméno klienta: ${name}`,
     `Telefon: ${phoneDisplay}`,
     `E-mail: ${email || PLACEHOLDER}`,
+    `IP adresa: ${ip}`,
     `Adresa nemovitosti: ${propertyAddress}`,
     `Typ zajištění: ${propertyType}`,
     `Požadovaná služba: ${serviceType}`,
     `Částka: ${amount}`,
-    `IP adresa: ${ip}`,
   ].join("\n")
 
   const notifyHtml = buildNotifyHtml({
