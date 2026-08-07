@@ -85,26 +85,29 @@ export default function KontaktyPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 mt-6">
-                  <a
-                    href={SOCIAL.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:brightness-105 bg-gradient-to-br from-[#f09433] via-[#dc2743] to-[#bc1888]"
-                    aria-label="Instagram"
-                  >
-                    <Instagram className="h-4 w-4" strokeWidth={2} aria-hidden />
-                  </a>
-                  <a
-                    href={SOCIAL.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:brightness-105 bg-[#1877F2]"
-                    aria-label="Facebook"
-                  >
-                    <Facebook className="h-4 w-4" strokeWidth={2} aria-hidden />
-                  </a>
-                </div>
+                <a
+                  href={SOCIAL.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mt-4 group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <Instagram className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-lg font-semibold text-primary group-hover:underline">Instagram</p>
+                </a>
+
+                <a
+                  href={SOCIAL.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mt-4 group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <Facebook className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-lg font-semibold text-primary group-hover:underline">Facebook</p>
+                </a>
 
                 <div className="mt-6">
                   <ZivefirmyBadge variant="light" />
