@@ -3,7 +3,12 @@ import { LoanCalculator } from "@/components/loan-calculator"
 import { LeadPopup } from "@/components/lead-popup"
 import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock } from "lucide-react"
+import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock, Facebook, Instagram } from "lucide-react"
+
+const SOCIAL = {
+  facebook: "https://www.facebook.com/share/159JsQe6Qg/",
+  instagram: "https://www.instagram.com/docasnyvykup.cz/",
+} as const
 
 export default function Home() {
   const benefits = [
@@ -147,6 +152,30 @@ export default function Home() {
                       <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
                     </p>
                   </div>
+
+                  <a
+                    href={SOCIAL.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mt-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Instagram className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-sm font-semibold text-primary group-hover:underline">Instagram</p>
+                  </a>
+
+                  <a
+                    href={SOCIAL.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mt-3 group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Facebook className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-sm font-semibold text-primary group-hover:underline">Facebook</p>
+                  </a>
 
                   <div className="mt-4">
                     <ZivefirmyBadge variant="light" />
