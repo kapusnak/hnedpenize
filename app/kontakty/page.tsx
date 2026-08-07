@@ -1,9 +1,14 @@
 import { Header } from "@/components/header"
-import { Phone, Mail, Clock, MapPin, Building2, FileText, Cookie } from "lucide-react"
+import { Phone, Mail, Clock, MapPin, Building2, FileText, Cookie, Facebook, Instagram } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/cta-section"
 import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import Link from "next/link"
+
+const SOCIAL = {
+  facebook: "https://www.facebook.com/share/159JsQe6Qg/",
+  instagram: "https://www.instagram.com/docasnyvykup.cz/",
+} as const
 
 export default function KontaktyPage() {
   return (
@@ -78,6 +83,27 @@ export default function KontaktyPage() {
                   <p className="text-muted-foreground">
                     <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
                   </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 mt-6">
+                  <a
+                    href={SOCIAL.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:brightness-105 bg-gradient-to-br from-[#f09433] via-[#dc2743] to-[#bc1888]"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </a>
+                  <a
+                    href={SOCIAL.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:brightness-105 bg-[#1877F2]"
+                    aria-label="Facebook"
+                  >
+                    <Facebook className="h-4 w-4" strokeWidth={2} aria-hidden />
+                  </a>
                 </div>
 
                 <div className="mt-6">
