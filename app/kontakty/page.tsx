@@ -40,7 +40,7 @@ export default function KontaktyPage() {
                     <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
                       <Home className="w-5 h-5 text-white" />
                     </div>
-                    <h2 className="text-xl font-bold text-foreground">Výkup nemovitostí</h2>
+                    <h2 className="text-xl font-bold text-foreground">Nemovitosti</h2>
                   </div>
 
                   <a
@@ -51,7 +51,6 @@ export default function KontaktyPage() {
                       <Phone className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Výkup nemovitostí</p>
                       <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 776 722 175</p>
                     </div>
                   </a>
@@ -66,7 +65,7 @@ export default function KontaktyPage() {
                     <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
                       <Car className="w-5 h-5 text-white" />
                     </div>
-                    <h2 className="text-xl font-bold text-foreground">Výkup vozidel</h2>
+                    <h2 className="text-xl font-bold text-foreground">Vozidla</h2>
                   </div>
 
                   <a
@@ -77,7 +76,6 @@ export default function KontaktyPage() {
                       <Phone className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Výkup vozidel</p>
                       <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 777 400 256</p>
                     </div>
                   </a>
@@ -91,20 +89,7 @@ export default function KontaktyPage() {
             <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
               <Card className="border border-border shadow-lg">
                 <CardContent className="p-6 lg:p-8">
-                  <h2 className="text-xl font-bold text-foreground mb-6">Obecné informace</h2>
-
-                  <a
-                    href="mailto:info@hnedpenize.cz"
-                    className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                      <Mail className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Napište nám</p>
-                      <p className="text-lg font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
-                    </div>
-                  </a>
+                  <h2 className="text-xl font-bold text-foreground mb-6">Kontaktujte nás</h2>
 
                   <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 mb-4">
                     <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -117,6 +102,18 @@ export default function KontaktyPage() {
                       </p>
                     </div>
                   </div>
+
+                  <a
+                    href="mailto:info@hnedpenize.cz"
+                    className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Mail className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
+                    </div>
+                  </a>
 
                   <div className="grid grid-cols-2 gap-3">
                     <a

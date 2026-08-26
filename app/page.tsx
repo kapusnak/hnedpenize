@@ -4,7 +4,7 @@ import { LeadPopup } from "@/components/lead-popup"
 import { WhatsAppCard } from "@/components/whatsapp-card"
 import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock, Facebook, Instagram } from "lucide-react"
+import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock, Facebook, Instagram, Car } from "lucide-react"
 
 const SOCIAL = {
   facebook: "https://www.facebook.com/share/159JsQe6Qg/",
@@ -102,11 +102,16 @@ export default function Home() {
               })}
             </div>
 
-            {/* Přímý kontakt - mobile only */}
-            <div className="mt-6 md:hidden">
+            {/* Kontakty - mobile only, stejná struktura jako /kontakty */}
+            <div className="mt-6 md:hidden space-y-4">
               <Card className="border-2 border-card/30 shadow-lg bg-card/95">
                 <CardContent className="p-4">
-                  <h2 className="text-lg font-bold text-foreground mb-4">Přímý kontakt</h2>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <HomeIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">Nemovitosti</h2>
+                  </div>
 
                   <a
                     href="tel:+420776722175"
@@ -116,10 +121,22 @@ export default function Home() {
                       <Phone className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Zavolejte nám</p>
                       <p className="text-base font-bold text-primary group-hover:underline">+420 776 722 175</p>
                     </div>
                   </a>
+
+                  <WhatsAppCard compact phone="420776722175" />
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-card/30 shadow-lg bg-card/95">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Car className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">Vozidla</h2>
+                  </div>
 
                   <a
                     href="tel:+420777400256"
@@ -129,12 +146,27 @@ export default function Home() {
                       <Phone className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Zavolejte nám</p>
                       <p className="text-base font-bold text-primary group-hover:underline">+420 777 400 256</p>
                     </div>
                   </a>
 
-                  <WhatsAppCard compact />
+                  <WhatsAppCard compact phone="420777400256" />
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-card/30 shadow-lg bg-card/95">
+                <CardContent className="p-4">
+                  <h2 className="text-lg font-bold text-foreground mb-4">Kontaktujte nás</h2>
+
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Pracovní doba</p>
+                      <p className="text-sm font-semibold text-foreground">Po–Pá: 8:00 – 18:00</p>
+                    </div>
+                  </div>
 
                   <a
                     href="mailto:info@hnedpenize.cz"
@@ -144,41 +176,35 @@ export default function Home() {
                       <Mail className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Napište nám</p>
                       <p className="text-sm font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
                     </div>
                   </a>
 
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-                    <Clock className="w-5 h-5 text-primary shrink-0" />
-                    <p className="text-muted-foreground text-sm">
-                      <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
-                    </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={SOCIAL.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <Instagram className="w-5 h-5 text-white" />
+                      </div>
+                      <p className="text-sm font-semibold text-primary group-hover:underline">Instagram</p>
+                    </a>
+
+                    <a
+                      href={SOCIAL.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <Facebook className="w-5 h-5 text-white" />
+                      </div>
+                      <p className="text-sm font-semibold text-primary group-hover:underline">Facebook</p>
+                    </a>
                   </div>
-
-                  <a
-                    href={SOCIAL.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mt-3 group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
-                      <Instagram className="w-5 h-5 text-white" />
-                    </div>
-                    <p className="text-sm font-semibold text-primary group-hover:underline">Instagram</p>
-                  </a>
-
-                  <a
-                    href={SOCIAL.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mt-3 group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
-                      <Facebook className="w-5 h-5 text-white" />
-                    </div>
-                    <p className="text-sm font-semibold text-primary group-hover:underline">Facebook</p>
-                  </a>
 
                   <div className="mt-4">
                     <ZivefirmyBadge variant="light" />

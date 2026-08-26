@@ -19,7 +19,7 @@ export function WhatsAppCard({
   compact = false,
   phone = DEFAULT_PHONE,
   label = "Napište nám na WhatsApp",
-  description = "Rychlá zpráva — odpovíme co nejdříve",
+  description = "- odpovíme co nejdříve",
 }: WhatsAppCardProps) {
   return (
     <a
@@ -28,13 +28,9 @@ export function WhatsAppCard({
       rel="noopener noreferrer"
       className={
         compact
-          ? "mb-3 flex max-w-full items-center gap-3 rounded-xl border px-3 py-3 transition-[filter,background-color] hover:brightness-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-          : "mb-4 flex max-w-full items-center gap-4 rounded-xl border p-4 transition-[filter,background-color] hover:brightness-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          ? "mb-3 flex max-w-full items-center gap-3 rounded-xl bg-primary/10 px-3 py-3 transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2"
+          : "mb-4 flex max-w-full items-center gap-4 rounded-xl bg-primary/5 p-4 transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2"
       }
-      style={{
-        borderColor: "#25D366",
-        backgroundColor: "#C8F4D8",
-      }}
     >
       <span
         className={
@@ -50,20 +46,18 @@ export function WhatsAppCard({
         <span
           className={
             compact
-              ? "block text-sm font-semibold leading-snug"
-              : "block text-sm font-semibold leading-snug sm:text-base"
+              ? "block text-sm font-bold leading-snug text-foreground"
+              : "block text-sm font-bold leading-snug text-foreground sm:text-base"
           }
-          style={{ color: "#075E54" }}
         >
           {label}
         </span>
         <span
           className={
             compact
-              ? "mt-0.5 block text-xs leading-snug"
-              : "mt-0.5 block text-xs leading-snug sm:text-sm"
+              ? "mt-0.5 block text-xs leading-snug text-muted-foreground"
+              : "mt-0.5 block text-xs leading-snug text-muted-foreground sm:text-sm"
           }
-          style={{ color: "#128C7E" }}
         >
           {description}
         </span>
