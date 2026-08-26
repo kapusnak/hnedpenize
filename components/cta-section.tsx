@@ -60,7 +60,8 @@ export function CtaSection() {
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-        <div className="flex flex-1 min-w-0 h-12 md:h-14 items-center gap-2 rounded-md bg-card pl-3 pr-4 text-foreground focus-within:ring-2 focus-within:ring-ring/50 focus-within:ring-offset-2 focus-within:ring-offset-background">
+        {/* flex-1 only in row layout (sm+); in mobile column layout it would override h-12 via flex-basis */}
+        <div className="flex sm:flex-1 min-w-0 h-12 md:h-14 items-center gap-2 rounded-md bg-card pl-3 pr-4 text-foreground focus-within:ring-2 focus-within:ring-ring/50 focus-within:ring-offset-2 focus-within:ring-offset-background">
           <Phone className="w-5 h-5 shrink-0 text-muted-foreground" aria-hidden />
           <PhoneDigitsInput
             className="min-w-0 flex-1 border-0 bg-transparent p-0 shadow-none h-full"
