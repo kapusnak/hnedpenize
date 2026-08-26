@@ -1,4 +1,4 @@
-const WHATSAPP_HREF = "https://wa.me/420776722175"
+const DEFAULT_PHONE = "420776722175"
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -8,37 +8,64 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
-export function WhatsAppCard({ compact = false }: { compact?: boolean }) {
+type WhatsAppCardProps = {
+  compact?: boolean
+  phone?: string
+  label?: string
+  description?: string
+}
+
+export function WhatsAppCard({
+  compact = false,
+  phone = DEFAULT_PHONE,
+  label = "Napište nám na WhatsApp",
+  description = "Rychlá zpráva — odpovíme co nejdříve",
+}: WhatsAppCardProps) {
   return (
     <a
-      href={WHATSAPP_HREF}
+      href={`https://wa.me/${phone}`}
       target="_blank"
       rel="noopener noreferrer"
       className={
         compact
-          ? "mb-3 inline-flex max-w-full items-center gap-3 rounded-xl border border-[#25D366]/45 bg-transparent px-3 py-2.5 transition-colors hover:border-[#25D366] hover:bg-[#25D366]/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/40 focus-visible:ring-offset-2"
-          : "mb-4 inline-flex max-w-full items-center gap-3 rounded-xl border border-[#25D366]/45 bg-transparent px-4 py-3 transition-colors hover:border-[#25D366] hover:bg-[#25D366]/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/40 focus-visible:ring-offset-2"
+          ? "mb-3 flex max-w-full items-center gap-3 rounded-xl border px-3 py-3 transition-[filter,background-color] hover:brightness-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          : "mb-4 flex max-w-full items-center gap-4 rounded-xl border p-4 transition-[filter,background-color] hover:brightness-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       }
+      style={{
+        borderColor: "#25D366",
+        backgroundColor: "#C8F4D8",
+      }}
     >
-      <WhatsAppIcon className={compact ? "h-6 w-6 shrink-0 text-[#25D366]" : "h-7 w-7 shrink-0 text-[#25D366]"} />
+      <span
+        className={
+          compact
+            ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+            : "flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+        }
+        style={{ backgroundColor: "#25D366", color: "#fff" }}
+      >
+        <WhatsAppIcon className={compact ? "h-5 w-5" : "h-6 w-6"} />
+      </span>
       <span className="min-w-0">
         <span
           className={
             compact
-              ? "block text-sm font-semibold leading-snug text-foreground"
-              : "block text-sm font-semibold leading-snug text-foreground sm:text-base"
+              ? "block text-sm font-semibold leading-snug"
+              : "block text-sm font-semibold leading-snug sm:text-base"
           }
+          style={{ color: "#075E54" }}
         >
-          Napište nám na WhatsApp
+          {label}
         </span>
         <span
           className={
             compact
-              ? "mt-0.5 block text-xs leading-snug text-muted-foreground"
-              : "mt-0.5 block text-xs leading-snug text-muted-foreground sm:text-sm"
+              ? "mt-0.5 block text-xs leading-snug"
+              : "mt-0.5 block text-xs leading-snug sm:text-sm"
           }
+          style={{ color: "#128C7E" }}
         >
-          Rychlá zpráva — odpovíme co nejdříve
+          {description}
         </span>
       </span>
     </a>

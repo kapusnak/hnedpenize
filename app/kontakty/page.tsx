@@ -1,6 +1,6 @@
 import { Header } from "@/components/header"
 import { WhatsAppCard } from "@/components/whatsapp-card"
-import { Phone, Mail, Clock, MapPin, Building2, FileText, Cookie, Facebook, Instagram } from "lucide-react"
+import { Phone, Mail, Clock, MapPin, Building2, FileText, Cookie, Facebook, Instagram, Home, Car } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/cta-section"
 import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
@@ -31,150 +31,157 @@ export default function KontaktyPage() {
       {/* Main Content */}
       <section className="pt-12 lg:pt-16 pb-4 lg:pb-6">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            {/* Left Column - Direct Contact */}
-            <Card className="border-2 border-primary/20 shadow-lg">
-              <CardContent className="p-6 lg:p-8">
-                <h2 className="text-xl font-bold text-foreground mb-6">Přímý kontakt</h2>
-
-                {/* Phone */}
-                <a
-                  href="tel:+420776722175"
-                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <Phone className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Zavolejte nám</p>
-                    <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 776 722 175</p>
-                  </div>
-                </a>
-
-                <a
-                  href="tel:+420777400256"
-                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <Phone className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Zavolejte nám</p>
-                    <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 777 400 256</p>
-                  </div>
-                </a>
-
-                <WhatsAppCard />
-
-                {/* Email */}
-                <a
-                  href="mailto:info@hnedpenize.cz"
-                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <Mail className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Napište nám</p>
-                    <p className="text-lg font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
-                  </div>
-                </a>
-
-                {/* Availability */}
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
-                  <Clock className="w-5 h-5 text-primary" />
-                  <p className="text-muted-foreground">
-                    <span className="font-medium text-foreground">Po-Pá:</span> 8:00 - 18:00
-                  </p>
-                </div>
-
-                <a
-                  href={SOCIAL.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mt-4 group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <Instagram className="w-6 h-6 text-white" />
-                  </div>
-                  <p className="text-lg font-semibold text-primary group-hover:underline">Instagram</p>
-                </a>
-
-                <a
-                  href={SOCIAL.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mt-4 group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <Facebook className="w-6 h-6 text-white" />
-                  </div>
-                  <p className="text-lg font-semibold text-primary group-hover:underline">Facebook</p>
-                </a>
-
-                <div className="mt-6">
-                  <ZivefirmyBadge variant="light" />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Right Column - Company Details */}
-            <Card className="border border-border shadow-lg">
-              <CardContent className="p-6 lg:p-8">
-                <h2 className="text-xl font-bold text-foreground mb-6">Fakturační údaje</h2>
-
-                <div className="space-y-4">
-                  {/* Company Name */}
-                  <div className="flex items-start gap-3">
-                    <Building2 className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Název společnosti</p>
-                      <p className="font-semibold text-foreground">Dočasný výkup s.r.o.</p>
+          <div className="max-w-5xl mx-auto space-y-6 lg:space-y-8">
+            {/* Row 1 — category contacts */}
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+              <Card className="border-2 border-primary/20 shadow-lg">
+                <CardContent className="p-6 lg:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Home className="w-5 h-5 text-white" />
                     </div>
+                    <h2 className="text-xl font-bold text-foreground">Výkup nemovitostí</h2>
                   </div>
 
-                  {/* IČ */}
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">IČ</p>
-                      <p className="font-semibold text-foreground">23626836</p>
-                    </div>
-                  </div>
-
-                  {/* Address */}
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Adresa</p>
-                      <p className="font-semibold text-foreground">Podvesná VII/6192, 760 01 Zlín</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Map - Podvesná VII/6192, 760 01 Zlín (coordinates from OSM geocoding) */}
-                <div className="mt-6 h-48 sm:h-56 rounded-xl overflow-hidden border border-border">
-                  <iframe
-                    title="Mapa sídla společnosti - Podvesná VII/6192, Zlín"
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=17.673%2C49.222%2C17.695%2C49.233&layer=mapnik&marker=49.2274%2C17.6839"
-                    className="w-full h-full border-0"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">
                   <a
-                    href="https://www.openstreetmap.org/?mlat=49.2274&mlon=17.6839#map=17/49.2274/17.6839"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-primary transition-colors"
+                    href="tel:+420776722175"
+                    className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
                   >
-                    Zobrazit větší mapu
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Phone className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Výkup nemovitostí</p>
+                      <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 776 722 175</p>
+                    </div>
                   </a>
-                </p>
-              </CardContent>
-            </Card>
+
+                  <WhatsAppCard phone="420776722175" />
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-primary/20 shadow-lg">
+                <CardContent className="p-6 lg:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Car className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-xl font-bold text-foreground">Výkup vozidel</h2>
+                  </div>
+
+                  <a
+                    href="tel:+420777400256"
+                    className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Phone className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Výkup vozidel</p>
+                      <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 777 400 256</p>
+                    </div>
+                  </a>
+
+                  <WhatsAppCard phone="420777400256" />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Row 2 — general info + billing */}
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+              <Card className="border border-border shadow-lg">
+                <CardContent className="p-6 lg:p-8">
+                  <h2 className="text-xl font-bold text-foreground mb-6">Obecné informace</h2>
+
+                  <a
+                    href="mailto:info@hnedpenize.cz"
+                    className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Mail className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Napište nám</p>
+                      <p className="text-lg font-semibold text-primary group-hover:underline">info@hnedpenize.cz</p>
+                    </div>
+                  </a>
+
+                  <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <Clock className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Pracovní doba</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        Po–Pá: 8:00 – 18:00
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={SOCIAL.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <Instagram className="w-5 h-5 text-white" />
+                      </div>
+                      <p className="text-sm font-semibold text-primary group-hover:underline">Instagram</p>
+                    </a>
+
+                    <a
+                      href={SOCIAL.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <Facebook className="w-5 h-5 text-white" />
+                      </div>
+                      <p className="text-sm font-semibold text-primary group-hover:underline">Facebook</p>
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-border shadow-lg">
+                <CardContent className="p-6 lg:p-8">
+                  <h2 className="text-xl font-bold text-foreground mb-6">Fakturační údaje</h2>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <Building2 className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Název společnosti</p>
+                        <p className="font-semibold text-foreground">Dočasný výkup s.r.o.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">IČ</p>
+                        <p className="font-semibold text-foreground">23626836</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <MapPin className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Adresa</p>
+                        <p className="font-semibold text-foreground">Podvesná VII/6192, 760 01 Zlín</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <ZivefirmyBadge variant="light" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
