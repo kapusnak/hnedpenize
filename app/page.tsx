@@ -1,6 +1,7 @@
 import { Header } from "@/components/header"
 import { LoanCalculator } from "@/components/loan-calculator"
 import { LeadPopup } from "@/components/lead-popup"
+import { WhatsAppCard } from "@/components/whatsapp-card"
 import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Zap, CheckCircle, MapPin, HomeIcon, Phone, Mail, Clock, Facebook, Instagram } from "lucide-react"
@@ -108,7 +109,7 @@ export default function Home() {
                   <h2 className="text-lg font-bold text-foreground mb-4">Přímý kontakt</h2>
 
                   <a
-                    href="tel:+420776075150"
+                    href="tel:+420776722175"
                     className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors mb-3 group"
                   >
                     <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -116,7 +117,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Zavolejte nám</p>
-                      <p className="text-base font-bold text-primary group-hover:underline">+420 776 075 150</p>
+                      <p className="text-base font-bold text-primary group-hover:underline">+420 776 722 175</p>
                     </div>
                   </a>
 
@@ -132,6 +133,8 @@ export default function Home() {
                       <p className="text-base font-bold text-primary group-hover:underline">+420 777 400 256</p>
                     </div>
                   </a>
+
+                  <WhatsAppCard compact />
 
                   <a
                     href="mailto:info@hnedpenize.cz"

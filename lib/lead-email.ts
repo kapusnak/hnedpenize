@@ -19,7 +19,7 @@ const SITE = {
   contactEmail: "info@hnedpenize.cz",
   signOff: "Váš tým Dočasný výkup s.r.o. (Hnedpenize.cz)",
   phones: [
-    { tel: "+420776075150", display: "+420 776 075 150" },
+    { tel: "+420776722175", display: "+420 776 722 175" },
     { tel: "+420777400256", display: "+420 777 400 256" },
   ],
 } as const

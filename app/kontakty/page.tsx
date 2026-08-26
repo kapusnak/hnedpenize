@@ -1,4 +1,5 @@
 import { Header } from "@/components/header"
+import { WhatsAppCard } from "@/components/whatsapp-card"
 import { Phone, Mail, Clock, MapPin, Building2, FileText, Cookie, Facebook, Instagram } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CtaSection } from "@/components/cta-section"
@@ -38,7 +39,7 @@ export default function KontaktyPage() {
 
                 {/* Phone */}
                 <a
-                  href="tel:+420776075150"
+                  href="tel:+420776722175"
                   className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-4 group"
                 >
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -46,7 +47,7 @@ export default function KontaktyPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Zavolejte nám</p>
-                    <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 776 075 150</p>
+                    <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 776 722 175</p>
                   </div>
                 </a>
 
@@ -62,6 +63,8 @@ export default function KontaktyPage() {
                     <p className="text-xl lg:text-2xl font-bold text-primary group-hover:underline">+420 777 400 256</p>
                   </div>
                 </a>
+
+                <WhatsAppCard />
 
                 {/* Email */}
                 <a
