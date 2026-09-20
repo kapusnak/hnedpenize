@@ -2,7 +2,11 @@
 
 import { useEffect } from "react"
 import { isCrawlerUserAgent } from "@/lib/crawler-user-agent"
-import { trackQrLetakScan, whenGtagReady } from "@/lib/track-qr-letak"
+import {
+  markQrLetakPending,
+  trackQrLetakScan,
+  whenAnalyticsReady,
+} from "@/lib/track-qr-letak"
 
 const HOME_PATH = "/"
 
@@ -19,10 +23,10 @@ export function QrLetakLanding() {
       return
     }
 
-    whenGtagReady(() => {
+    markQrLetakPending()
+    whenAnalyticsReady(() => {
       if (cancelled) return
-      const timeoutMs = typeof window.gtag === "function" ? 2000 : 400
-      trackQrLetakScan(goHome, timeoutMs)
+      trackQrLetakScan(goHome)
     })
 
     return () => {

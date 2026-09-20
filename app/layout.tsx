@@ -5,6 +5,7 @@ import { AppToaster } from "@/components/app-toaster"
 import { GoogleAdsGtag } from "@/components/google-ads-gtag"
 import { GoogleAnalytics } from "@/components/google-analytics"
 import { GoogleTagManager } from "@/components/google-tag-manager"
+import { QrLetakReplay } from "@/components/qr-letak-replay"
 import "./globals.css"
 
 const _inter = Inter({ subsets: ["latin"] })
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <GoogleTagManager />
         <GoogleAdsGtag />
+        <QrLetakReplay />
         {children}
         <GoogleAnalytics />
         <AppToaster />
