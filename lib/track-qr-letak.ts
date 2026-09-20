@@ -71,9 +71,24 @@ function hasQrLetakPending(): boolean {
   }
 }
 
+function gtagCampaign(): {
+  source: string
+  medium: string
+  name: string
+} {
+  return {
+    source: QR_LETAK_CAMPAIGN.campaign_source,
+    medium: QR_LETAK_CAMPAIGN.campaign_medium,
+    name: QR_LETAK_CAMPAIGN.campaign_name,
+  }
+}
+
 /**
- * Records a flyer QR scan via GTM dataLayer and/or gtag, then invokes `onDone`
- * after GTM/gtag handoff (or after EVENT_HANDOFF_MS — never a sub-second cut).
+ * Records exactly one flyer QR scan:
+ * - GTM configured → `dataLayer.push({ event: 'qr_letak' })` only (GTM CE tag sends GA4)
+ * - otherwise, if gtag exists → `gtag('event', 'qr_letak')`
+ *
+ * Do not send both: GTM + gtag was double-counting in GA4 Realtime.
  */
 export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_MS): void {
   if (typeof window === "undefined") {
@@ -81,48 +96,50 @@ export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_
     return
   }
 
-  const done = finishOnce(onDone)
-  const delivered = () => {
+  const liveCollector = HAS_GTM ? isGtmReady() : isGtagReady()
+  const go = finishOnce(onDone)
+  const succeed = () => {
     clearQrLetakPending()
-    done()
+    go()
   }
 
-  const timer = window.setTimeout(done, timeoutMs)
+  const timer = window.setTimeout(() => {
+    // GTM/gtag was live when we queued the event — the handoff window elapsed,
+    // so do not let the homepage replay a second hit.
+    if (liveCollector) clearQrLetakPending()
+    go()
+  }, timeoutMs)
 
-  window.dataLayer = window.dataLayer ?? []
-  window.dataLayer.push({
-    event: GA_EVENT_QR_LETAK,
-    ...QR_LETAK_CAMPAIGN,
-    eventCallback: () => {
-      window.clearTimeout(timer)
-      delivered()
-    },
-    eventTimeout: timeoutMs,
-  })
+  if (HAS_GTM) {
+    window.dataLayer = window.dataLayer ?? []
+    window.dataLayer.push({
+      event: GA_EVENT_QR_LETAK,
+      ...QR_LETAK_CAMPAIGN,
+      eventCallback: () => {
+        window.clearTimeout(timer)
+        succeed()
+      },
+      eventTimeout: timeoutMs,
+    })
+    return
+  }
 
   const gtag = window.gtag
-  if (typeof gtag !== "function") return
-
-  gtag("set", {
-    campaign: {
-      source: QR_LETAK_CAMPAIGN.campaign_source,
-      medium: QR_LETAK_CAMPAIGN.campaign_medium,
-      name: QR_LETAK_CAMPAIGN.campaign_name,
-    },
-  })
-
-  const eventParams: Record<string, unknown> = {
-    ...QR_LETAK_CAMPAIGN,
-    event_timeout: timeoutMs,
+  if (typeof gtag === "function") {
+    gtag("set", { campaign: gtagCampaign() })
+    gtag("event", GA_EVENT_QR_LETAK, {
+      ...QR_LETAK_CAMPAIGN,
+      event_callback: () => {
+        window.clearTimeout(timer)
+        succeed()
+      },
+      event_timeout: timeoutMs,
+    })
+    return
   }
-  // Ads gtag callback is not proof GTM sent GA4 — don't cut the GTM handoff short.
-  if (!HAS_GTM) {
-    eventParams.event_callback = () => {
-      window.clearTimeout(timer)
-      delivered()
-    }
-  }
-  gtag("event", GA_EVENT_QR_LETAK, eventParams)
+
+  window.clearTimeout(timer)
+  go()
 }
 
 /**
@@ -150,7 +167,7 @@ export function whenAnalyticsReady(
   }, 50)
 }
 
-/** Homepage safety net: if `/qr` navigated away before GTM acknowledged the hit. */
+/** Homepage safety net: only if `/qr` never successfully handed off the event. */
 export function consumePendingQrLetakScan(): void {
   if (typeof window === "undefined") return
   if (!hasQrLetakPending()) return
