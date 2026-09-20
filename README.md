@@ -8,6 +8,7 @@ Marketingový web pro **Dočasný výkup s.r.o.** (zpětný leasing, zajištěn�
 - **Deployment:** Railway (Nixpacks) — `npm run build` + `next start`
 - **Analytics:** Google Tag Manager + Google Analytics (volitelně přes env)
 - **Forms:** `POST /api/lead` → Nodemailer / Spacemail (notifikace včetně IP)
+- **Leták QR:** tištěný kód směrujte na `https://<doména>/qr` — v prohlížeči se odešle událost `qr_letak` a návštěvník skončí na čistém `/`
 
 ## Build a deploy
 
