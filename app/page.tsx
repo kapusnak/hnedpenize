@@ -1,4 +1,5 @@
 import { Header } from "@/components/header"
+import { HeroHousePhoto } from "@/components/hero-house-photo"
 import { LoanCalculator } from "@/components/loan-calculator"
 import { LeadPopup } from "@/components/lead-popup"
 import { WhatsAppCard } from "@/components/whatsapp-card"
@@ -44,16 +45,18 @@ export default function Home() {
         <Header />
 
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
           <div className="absolute top-20 left-10 w-48 sm:w-72 h-48 sm:h-72 rounded-full bg-card blur-3xl" />
           <div className="absolute bottom-20 right-10 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-card blur-3xl" />
         </div>
+
+        <HeroHousePhoto />
 
         <div className="container mx-auto px-4 pt-28 pb-6 lg:py-8 lg:pt-24 flex-1 flex flex-col relative z-10">
           {/* Main Content */}
           <div className="flex-1 flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
             {/* Left Content - Now order-1 on mobile so text appears first */}
-            <div className="text-card space-y-3 text-center lg:text-left order-1 lg:order-1 lg:flex-1">
+            <div className="text-card space-y-3 text-center lg:text-left order-1 lg:order-1 lg:flex-1 [text-shadow:0_1px_18px_rgba(30,80,180,0.35)]">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-balance">
                 Okamžité finance jištěné
                 <span className="block text-card/90">nemovitostí nebo vozem</span>
