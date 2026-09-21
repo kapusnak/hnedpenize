@@ -10,7 +10,7 @@ export function HeroHousePhoto() {
           fill
           priority
           sizes="(max-width: 1023px) 100vw, 70vw"
-          className="object-cover object-[48%_46%] sm:object-[44%_44%] lg:object-[42%_42%]"
+          className="object-cover object-[52%_50%] sm:object-[50%_48%] lg:object-[48%_46%]"
         />
         <div
           className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-primary/35 to-primary/70 lg:from-blue-400/20 lg:via-primary/40 lg:to-primary"
