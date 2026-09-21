@@ -52,9 +52,9 @@ export default function Home() {
 
         <HeroHousePhoto />
 
-        <div className="container mx-auto px-4 pt-28 pb-6 lg:py-8 lg:pt-24 flex-1 flex flex-col relative z-10">
+        <div className="container mx-auto px-4 pt-24 pb-6 lg:pt-24 lg:pb-5 flex-1 flex flex-col relative z-10">
           {/* Main Content */}
-          <div className="flex-1 flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
+          <div className="flex-1 flex flex-col lg:flex-row lg:items-start gap-5 lg:gap-10">
             {/* Left Content - Now order-1 on mobile so text appears first */}
             <div className="text-card space-y-3 text-center lg:text-left order-1 lg:order-1 lg:flex-1 [text-shadow:0_1px_18px_rgba(30,80,180,0.35)]">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-balance">
