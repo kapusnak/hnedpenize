@@ -5,7 +5,7 @@ import { isCrawlerUserAgent } from "@/lib/crawler-user-agent"
 import {
   markQrLetakPending,
   trackQrLetakScan,
-  whenAnalyticsReady,
+  whenGtagReady,
 } from "@/lib/track-qr-letak"
 
 const HOME_PATH = "/"
@@ -24,8 +24,9 @@ export function QrLetakLanding() {
     }
 
     markQrLetakPending()
-    whenAnalyticsReady(() => {
+    whenGtagReady(() => {
       if (cancelled) return
+      // Replace `/` only after gtag event_callback or the handoff timeout.
       trackQrLetakScan(goHome)
     })
 
