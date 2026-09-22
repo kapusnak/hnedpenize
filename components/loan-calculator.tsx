@@ -19,7 +19,22 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PhoneDigitsInput } from "@/components/phone-digits-input"
 import { cn } from "@/lib/utils"
-import { Building2, Car, Check, Loader2, Lock } from "lucide-react"
+import {
+  Building2,
+  Calendar,
+  Car,
+  Check,
+  Clock,
+  Gauge,
+  Hash,
+  Loader2,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+  type LucideIcon,
+} from "lucide-react"
 
 const LOCK_THRESHOLD_PX = 10
 
@@ -297,9 +312,29 @@ function emptyRealEstateFields(): Pick<
 }
 
 const phoneInputWrapperClass =
-  "flex h-11 w-full items-center rounded-md border border-border bg-secondary px-3 text-sm shadow-sm outline-none transition-[color,box-shadow] focus-within:ring-[3px] focus-within:ring-ring/50 focus-within:border-ring"
+  "flex h-11 w-full items-center rounded-md border border-border bg-secondary pl-10 pr-3 text-sm shadow-sm outline-none transition-[color,box-shadow] focus-within:ring-[3px] focus-within:ring-ring/50 focus-within:border-ring"
+
+const fieldInputClass = "bg-secondary border-border h-11 pl-10 text-sm"
 
 const requiredStar = <span className="text-red-600">*</span>
+
+function IconField({
+  icon: Icon,
+  children,
+}: {
+  icon: LucideIcon
+  children: React.ReactNode
+}) {
+  return (
+    <div className="relative">
+      <Icon
+        className="pointer-events-none absolute top-1/2 left-3 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden
+      />
+      {children}
+    </div>
+  )
+}
 
 export function LoanCalculator() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
@@ -454,7 +489,7 @@ export function LoanCalculator() {
   }
 
   return (
-    <Card className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl border-0 bg-card">
+    <Card className="w-full max-w-[calc(100vw-2rem)] rounded-2xl border-0 bg-card shadow-2xl ring-1 ring-black/5 sm:max-w-md">
       <CardContent className="px-4 sm:px-5 py-4 sm:py-5">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-card-foreground">Nezávazná žádost o financování</h3>
@@ -557,15 +592,17 @@ export function LoanCalculator() {
                     <Label htmlFor="name" className="text-sm font-medium text-muted-foreground">
                       Jméno a příjmení {requiredStar}
                     </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      autoComplete="name"
-                      className="bg-secondary border-border h-11 text-sm"
-                      aria-invalid={Boolean(form.formState.errors.name)}
-                      aria-describedby={form.formState.errors.name ? "name-error" : undefined}
-                      {...form.register("name")}
-                    />
+                    <IconField icon={User}>
+                      <Input
+                        id="name"
+                        type="text"
+                        autoComplete="name"
+                        className={fieldInputClass}
+                        aria-invalid={Boolean(form.formState.errors.name)}
+                        aria-describedby={form.formState.errors.name ? "name-error" : undefined}
+                        {...form.register("name")}
+                      />
+                    </IconField>
                     {form.formState.errors.name && (
                       <p id="name-error" className="mt-1 text-sm text-red-600">
                         {form.formState.errors.name.message}
@@ -576,15 +613,17 @@ export function LoanCalculator() {
                     <Label htmlFor="phone-nem" className="text-sm font-medium text-muted-foreground">
                       Telefon {requiredStar}
                     </Label>
-                    <PhoneDigitsInput
-                      id="phone-nem"
-                      className={phoneInputWrapperClass}
-                      inputClassName="placeholder:text-muted-foreground"
-                      value={form.watch("phoneDigits")}
-                      onChange={(v) => form.setValue("phoneDigits", v)}
-                      aria-invalid={Boolean(form.formState.errors.phoneDigits)}
-                      aria-describedby={form.formState.errors.phoneDigits ? "phone-nem-error" : undefined}
-                    />
+                    <IconField icon={Phone}>
+                      <PhoneDigitsInput
+                        id="phone-nem"
+                        className={phoneInputWrapperClass}
+                        inputClassName="placeholder:text-muted-foreground"
+                        value={form.watch("phoneDigits")}
+                        onChange={(v) => form.setValue("phoneDigits", v)}
+                        aria-invalid={Boolean(form.formState.errors.phoneDigits)}
+                        aria-describedby={form.formState.errors.phoneDigits ? "phone-nem-error" : undefined}
+                      />
+                    </IconField>
                     {form.formState.errors.phoneDigits && (
                       <p id="phone-nem-error" className="mt-1 text-sm text-red-600">
                         {form.formState.errors.phoneDigits.message}
@@ -597,18 +636,20 @@ export function LoanCalculator() {
                   <Label htmlFor="property-address" className="text-sm font-medium text-muted-foreground">
                     Adresa nemovitosti {requiredStar}
                   </Label>
-                  <Input
-                    id="property-address"
-                    type="text"
-                    autoComplete="street-address"
-                    placeholder="Ulice a č.p., město"
-                    className="bg-secondary border-border h-11 text-sm"
-                    aria-invalid={Boolean(form.formState.errors.propertyAddress)}
-                    aria-describedby={
-                      form.formState.errors.propertyAddress ? "property-address-error" : undefined
-                    }
-                    {...form.register("propertyAddress")}
-                  />
+                  <IconField icon={MapPin}>
+                    <Input
+                      id="property-address"
+                      type="text"
+                      autoComplete="street-address"
+                      placeholder="Ulice a č.p., město"
+                      className={fieldInputClass}
+                      aria-invalid={Boolean(form.formState.errors.propertyAddress)}
+                      aria-describedby={
+                        form.formState.errors.propertyAddress ? "property-address-error" : undefined
+                      }
+                      {...form.register("propertyAddress")}
+                    />
+                  </IconField>
                   {form.formState.errors.propertyAddress && (
                     <p id="property-address-error" className="mt-1 text-sm text-red-600">
                       {form.formState.errors.propertyAddress.message}
@@ -620,15 +661,17 @@ export function LoanCalculator() {
                   <Label htmlFor="email-nem" className="text-sm font-medium text-muted-foreground">
                     E-mail {requiredStar}
                   </Label>
-                  <Input
-                    id="email-nem"
-                    type="email"
-                    autoComplete="email"
-                    className="bg-secondary border-border h-11 text-sm"
-                    aria-invalid={Boolean(form.formState.errors.email)}
-                    aria-describedby={form.formState.errors.email ? "email-nem-error" : undefined}
-                    {...form.register("email")}
-                  />
+                  <IconField icon={Mail}>
+                    <Input
+                      id="email-nem"
+                      type="email"
+                      autoComplete="email"
+                      className={fieldInputClass}
+                      aria-invalid={Boolean(form.formState.errors.email)}
+                      aria-describedby={form.formState.errors.email ? "email-nem-error" : undefined}
+                      {...form.register("email")}
+                    />
+                  </IconField>
                   {form.formState.errors.email && (
                     <p id="email-nem-error" className="mt-1 text-sm text-red-600">
                       {form.formState.errors.email.message}
@@ -642,13 +685,15 @@ export function LoanCalculator() {
                   <Label htmlFor="vehicle-model" className="text-sm font-medium text-muted-foreground">
                     Značka a model vozu {requiredStar}
                   </Label>
-                  <Input
-                    id="vehicle-model"
-                    className="bg-secondary border-border h-11 text-sm"
-                    aria-invalid={Boolean(form.formState.errors.vehicleModel)}
-                    aria-describedby={form.formState.errors.vehicleModel ? "vehicle-model-error" : undefined}
-                    {...form.register("vehicleModel")}
-                  />
+                  <IconField icon={Car}>
+                    <Input
+                      id="vehicle-model"
+                      className={fieldInputClass}
+                      aria-invalid={Boolean(form.formState.errors.vehicleModel)}
+                      aria-describedby={form.formState.errors.vehicleModel ? "vehicle-model-error" : undefined}
+                      {...form.register("vehicleModel")}
+                    />
+                  </IconField>
                   <p className="text-xs text-muted-foreground">Např. Škoda Fabia</p>
                   {form.formState.errors.vehicleModel && (
                     <p id="vehicle-model-error" className="mt-1 text-sm text-red-600">
@@ -662,14 +707,16 @@ export function LoanCalculator() {
                     <Label htmlFor="vehicle-year" className="text-sm font-medium text-muted-foreground">
                       Rok výroby {requiredStar}
                     </Label>
-                    <Input
-                      id="vehicle-year"
-                      inputMode="numeric"
-                      className="bg-secondary border-border h-11 text-sm"
-                      aria-invalid={Boolean(form.formState.errors.year)}
-                      aria-describedby={form.formState.errors.year ? "vehicle-year-error" : undefined}
-                      {...form.register("year")}
-                    />
+                    <IconField icon={Calendar}>
+                      <Input
+                        id="vehicle-year"
+                        inputMode="numeric"
+                        className={fieldInputClass}
+                        aria-invalid={Boolean(form.formState.errors.year)}
+                        aria-describedby={form.formState.errors.year ? "vehicle-year-error" : undefined}
+                        {...form.register("year")}
+                      />
+                    </IconField>
                     <p className="text-xs text-muted-foreground">Např. 2019</p>
                     {form.formState.errors.year && (
                       <p id="vehicle-year-error" className="mt-1 text-sm text-red-600">
@@ -681,14 +728,16 @@ export function LoanCalculator() {
                     <Label htmlFor="vehicle-km" className="text-sm font-medium text-muted-foreground">
                       Počet najetých kilometrů {requiredStar}
                     </Label>
-                    <Input
-                      id="vehicle-km"
-                      inputMode="numeric"
-                      className="bg-secondary border-border h-11 text-sm"
-                      aria-invalid={Boolean(form.formState.errors.mileage)}
-                      aria-describedby={form.formState.errors.mileage ? "vehicle-km-error" : undefined}
-                      {...form.register("mileage")}
-                    />
+                    <IconField icon={Gauge}>
+                      <Input
+                        id="vehicle-km"
+                        inputMode="numeric"
+                        className={fieldInputClass}
+                        aria-invalid={Boolean(form.formState.errors.mileage)}
+                        aria-describedby={form.formState.errors.mileage ? "vehicle-km-error" : undefined}
+                        {...form.register("mileage")}
+                      />
+                    </IconField>
                     <p className="text-xs text-muted-foreground">Např. 142 000 km</p>
                     {form.formState.errors.mileage && (
                       <p id="vehicle-km-error" className="mt-1 text-sm text-red-600">
@@ -702,7 +751,9 @@ export function LoanCalculator() {
                   <Label htmlFor="vehicle-vin" className="text-sm font-medium text-muted-foreground">
                     VIN (nepovinné)
                   </Label>
-                  <Input id="vehicle-vin" className="bg-secondary border-border h-11 text-sm" {...form.register("vin")} />
+                  <IconField icon={Hash}>
+                    <Input id="vehicle-vin" className={fieldInputClass} {...form.register("vin")} />
+                  </IconField>
                   <p className="text-xs text-muted-foreground">Např. TMBJF7CN0S123456</p>
                 </div>
 
@@ -747,17 +798,19 @@ export function LoanCalculator() {
                   <Label htmlFor="contract-duration-months" className="text-sm font-medium text-muted-foreground">
                     Trvání smlouvy (měsíce)
                   </Label>
-                  <Input
-                    id="contract-duration-months"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    className="bg-secondary border-border h-11 text-sm"
-                    aria-invalid={Boolean(form.formState.errors.contractDurationMonths)}
-                    aria-describedby={
-                      form.formState.errors.contractDurationMonths ? "contract-duration-months-error" : undefined
-                    }
-                    {...form.register("contractDurationMonths")}
-                  />
+                  <IconField icon={Clock}>
+                    <Input
+                      id="contract-duration-months"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      className={fieldInputClass}
+                      aria-invalid={Boolean(form.formState.errors.contractDurationMonths)}
+                      aria-describedby={
+                        form.formState.errors.contractDurationMonths ? "contract-duration-months-error" : undefined
+                      }
+                      {...form.register("contractDurationMonths")}
+                    />
+                  </IconField>
                   <p className="text-xs text-muted-foreground">Např. 24</p>
                   {form.formState.errors.contractDurationMonths && (
                     <p id="contract-duration-months-error" className="mt-1 text-sm text-red-600">
@@ -771,14 +824,16 @@ export function LoanCalculator() {
                     <Label htmlFor="first-name" className="text-sm font-medium text-muted-foreground">
                       Jméno {requiredStar}
                     </Label>
-                    <Input
-                      id="first-name"
-                      autoComplete="given-name"
-                      className="bg-secondary border-border h-11 text-sm"
-                      aria-invalid={Boolean(form.formState.errors.firstName)}
-                      aria-describedby={form.formState.errors.firstName ? "first-name-error" : undefined}
-                      {...form.register("firstName")}
-                    />
+                    <IconField icon={User}>
+                      <Input
+                        id="first-name"
+                        autoComplete="given-name"
+                        className={fieldInputClass}
+                        aria-invalid={Boolean(form.formState.errors.firstName)}
+                        aria-describedby={form.formState.errors.firstName ? "first-name-error" : undefined}
+                        {...form.register("firstName")}
+                      />
+                    </IconField>
                     {form.formState.errors.firstName && (
                       <p id="first-name-error" className="mt-1 text-sm text-red-600">
                         {form.formState.errors.firstName.message}
@@ -789,14 +844,16 @@ export function LoanCalculator() {
                     <Label htmlFor="last-name" className="text-sm font-medium text-muted-foreground">
                       Příjmení {requiredStar}
                     </Label>
-                    <Input
-                      id="last-name"
-                      autoComplete="family-name"
-                      className="bg-secondary border-border h-11 text-sm"
-                      aria-invalid={Boolean(form.formState.errors.lastName)}
-                      aria-describedby={form.formState.errors.lastName ? "last-name-error" : undefined}
-                      {...form.register("lastName")}
-                    />
+                    <IconField icon={User}>
+                      <Input
+                        id="last-name"
+                        autoComplete="family-name"
+                        className={fieldInputClass}
+                        aria-invalid={Boolean(form.formState.errors.lastName)}
+                        aria-describedby={form.formState.errors.lastName ? "last-name-error" : undefined}
+                        {...form.register("lastName")}
+                      />
+                    </IconField>
                     {form.formState.errors.lastName && (
                       <p id="last-name-error" className="mt-1 text-sm text-red-600">
                         {form.formState.errors.lastName.message}
@@ -809,15 +866,17 @@ export function LoanCalculator() {
                   <Label htmlFor="phone-voz" className="text-sm font-medium text-muted-foreground">
                     Telefonní číslo {requiredStar}
                   </Label>
-                  <PhoneDigitsInput
-                    id="phone-voz"
-                    className={phoneInputWrapperClass}
-                    inputClassName="placeholder:text-muted-foreground"
-                    value={form.watch("phoneDigits")}
-                    onChange={(v) => form.setValue("phoneDigits", v)}
-                    aria-invalid={Boolean(form.formState.errors.phoneDigits)}
-                    aria-describedby={form.formState.errors.phoneDigits ? "phone-voz-error" : undefined}
-                  />
+                  <IconField icon={Phone}>
+                    <PhoneDigitsInput
+                      id="phone-voz"
+                      className={phoneInputWrapperClass}
+                      inputClassName="placeholder:text-muted-foreground"
+                      value={form.watch("phoneDigits")}
+                      onChange={(v) => form.setValue("phoneDigits", v)}
+                      aria-invalid={Boolean(form.formState.errors.phoneDigits)}
+                      aria-describedby={form.formState.errors.phoneDigits ? "phone-voz-error" : undefined}
+                    />
+                  </IconField>
                   {form.formState.errors.phoneDigits && (
                     <p id="phone-voz-error" className="mt-1 text-sm text-red-600">
                       {form.formState.errors.phoneDigits.message}
@@ -829,15 +888,17 @@ export function LoanCalculator() {
                   <Label htmlFor="email-voz" className="text-sm font-medium text-muted-foreground">
                     E-mail {requiredStar}
                   </Label>
-                  <Input
-                    id="email-voz"
-                    type="email"
-                    autoComplete="email"
-                    className="bg-secondary border-border h-11 text-sm"
-                    aria-invalid={Boolean(form.formState.errors.email)}
-                    aria-describedby={form.formState.errors.email ? "email-voz-error" : undefined}
-                    {...form.register("email")}
-                  />
+                  <IconField icon={Mail}>
+                    <Input
+                      id="email-voz"
+                      type="email"
+                      autoComplete="email"
+                      className={fieldInputClass}
+                      aria-invalid={Boolean(form.formState.errors.email)}
+                      aria-describedby={form.formState.errors.email ? "email-voz-error" : undefined}
+                      {...form.register("email")}
+                    />
+                  </IconField>
                   {form.formState.errors.email && (
                     <p id="email-voz-error" className="mt-1 text-sm text-red-600">
                       {form.formState.errors.email.message}
