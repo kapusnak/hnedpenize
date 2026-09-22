@@ -36,6 +36,7 @@ function installWindow(
 ) {
   const sessionStorage = mockSessionStorage()
   const timers: Array<{ id: number; fn: () => void; at: number }> = []
+  const liveIntervals = new Set<number>()
   let nextId = 1
   let now = 0
   const origin = realDateNow()
@@ -64,12 +65,13 @@ function installWindow(
     },
     setInterval(fn: () => void, ms: number) {
       const id = nextId++
+      liveIntervals.add(id)
       const tick = () => {
         timers.push({
           id,
           fn: () => {
             fn()
-            if (timers.some((timer) => timer.id === id)) tick()
+            if (liveIntervals.has(id)) tick()
           },
           at: now + ms,
         })
@@ -78,6 +80,7 @@ function installWindow(
       return id
     },
     clearInterval(id: number) {
+      liveIntervals.delete(id)
       for (let i = timers.length - 1; i >= 0; i--) {
         if (timers[i].id === id) timers.splice(i, 1)
       }
@@ -253,6 +256,25 @@ test("whenGtagReady waits until gtag and google_tag_manager are ready", () => {
 
   win.window.google_tag_manager = {}
   clock.flush(50)
+  assert.equal(ready, true)
+})
+
+test("whenGtagReady does not treat dataLayer gtm.js as container ready", () => {
+  const clock = installWindow()
+  let ready = false
+  whenGtagReady(() => {
+    ready = true
+  }, 1000)
+
+  const win = globalThis as {
+    window: { gtag?: () => void; dataLayer: unknown[] }
+  }
+  win.window.gtag = () => {}
+  win.window.dataLayer.push({ "gtm.start": 1, event: "gtm.js" })
+  clock.flush(50)
+  assert.equal(ready, false)
+
+  clock.flush(1000)
   assert.equal(ready, true)
 })
 
