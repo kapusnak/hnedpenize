@@ -336,7 +336,7 @@ function IconField({
   )
 }
 
-export function LoanCalculator() {
+export function LoanCalculator({ embedded = false }: { embedded?: boolean }) {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
 
   const defaultValues: CalculatorFormValues = {
@@ -489,7 +489,12 @@ export function LoanCalculator() {
   }
 
   return (
-    <Card className="w-full max-w-[calc(100vw-2rem)] rounded-2xl border-0 bg-card shadow-2xl ring-1 ring-black/5 sm:max-w-md">
+    <Card
+      className={cn(
+        "w-full max-w-[calc(100vw-2rem)] rounded-2xl border-0 bg-card shadow-2xl ring-1 ring-black/5 sm:max-w-md",
+        embedded && "max-w-none gap-0 rounded-none bg-transparent py-0 shadow-none ring-0 sm:max-w-none",
+      )}
+    >
       <CardContent className="px-4 sm:px-5 py-4 sm:py-5">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-card-foreground">Nezávazná žádost o financování</h3>

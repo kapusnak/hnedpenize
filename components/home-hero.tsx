@@ -3,8 +3,6 @@ import { Zap, CheckCircle, MapPin, HomeIcon } from "lucide-react"
 
 import { LoanCalculator } from "@/components/loan-calculator"
 
-const chips = ["Peníze do 24h", "Majetek užíváte dál", "Celá ČR"] as const
-
 const benefits = [
   {
     icon: Zap,
@@ -31,34 +29,29 @@ const benefits = [
 export function HomeHero() {
   return (
     <div className="container mx-auto flex flex-1 flex-col px-4 pb-6 pt-28 lg:pb-8 lg:pt-24">
-      <div className="grid flex-1 items-stretch gap-6 lg:min-h-[calc(100dvh-6.5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] lg:gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,30rem)]">
-        <div className="relative isolate h-full min-h-[22rem] overflow-hidden rounded-3xl sm:min-h-[26rem]">
+      <div className="overflow-hidden rounded-2xl bg-card shadow-xl sm:rounded-3xl lg:grid lg:min-h-[calc(100dvh-6.5rem)] lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,28rem)] lg:items-stretch">
+        <div className="relative isolate min-h-[22rem] overflow-hidden sm:min-h-[26rem] lg:min-h-full">
           <Image
             src="/hero-house.webp"
             alt="Moderní rodinný dům"
             fill
             priority
-            sizes="(max-width: 1023px) 100vw, 60vw"
-            className="object-cover object-[46%_50%] saturate-[1.12] contrast-[1.04] sm:object-[48%_48%] lg:object-[42%_46%]"
+            sizes="(max-width: 1023px) 100vw, 65vw"
+            className="hero-house-blend object-cover object-[46%_50%] saturate-[1.12] contrast-[1.04] sm:object-[48%_48%] lg:object-[42%_46%]"
           />
 
-          {/* Left-weighted darkening so copy is readable — house stays sharp and saturated. */}
+          {/* Contrast only where copy sits — the house stays saturated. */}
           <div
-            className="absolute inset-0 bg-gradient-to-r from-slate-950/75 via-slate-950/35 via-[40%] to-transparent to-[72%]"
+            className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/25 lg:bg-gradient-to-r lg:from-black/55 lg:via-black/22 lg:via-[34%] lg:to-transparent lg:to-[70%]"
             aria-hidden
           />
+          {/* Soft white fade into the form: vertical on mobile, horizontal on desktop. */}
           <div
-            className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-slate-950/20"
-            aria-hidden
-          />
-
-          {/* Soft white fade ONLY on the edge that meets the form — not a whole-image wash. */}
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 hidden w-[18%] bg-gradient-to-r from-transparent via-background/35 to-background lg:block"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-card lg:inset-y-0 lg:left-auto lg:right-0 lg:h-auto lg:w-24 lg:bg-gradient-to-r lg:from-transparent lg:via-card/55 lg:to-card xl:w-28"
             aria-hidden
           />
 
-          <div className="relative z-10 flex h-full min-h-[22rem] flex-col justify-between gap-5 p-5 sm:min-h-[26rem] sm:p-7 lg:gap-8 lg:p-8 xl:px-10 xl:pt-8 xl:pb-8">
+          <div className="relative z-10 flex h-full min-h-[22rem] flex-col justify-between gap-5 px-5 py-6 sm:min-h-[26rem] sm:px-8 sm:py-8 lg:min-h-[42rem] lg:gap-8 lg:px-10 lg:py-9 lg:pr-14 xl:px-12">
             <div className="max-w-2xl space-y-3 text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.35)]">
               <h1 className="text-2xl font-bold leading-[1.15] sm:text-3xl lg:text-4xl xl:text-[2.6rem] 2xl:text-5xl">
                 Okamžité finance jištěné
@@ -68,14 +61,6 @@ export function HomeHero() {
                 Získejte potřebnou hotovost do 24 hodin a svůj majetek využívejte dál bez omezení. Diskrétní řešení pro
                 podnikatele i soukromé osoby s vysokou průchodností schválení.
               </p>
-              <div className="flex flex-wrap gap-3 pt-1 sm:gap-5">
-                {chips.map((label) => (
-                  <div key={label} className="flex items-center gap-1.5">
-                    <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                    <span className="text-sm text-white/90">{label}</span>
-                  </div>
-                ))}
-              </div>
             </div>
 
             <div className="w-full max-w-md rounded-2xl border border-white/15 bg-slate-950/50 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-md sm:p-4">
@@ -101,8 +86,8 @@ export function HomeHero() {
           </div>
         </div>
 
-        <div className="relative z-20 flex justify-center lg:-ml-6 lg:items-start lg:justify-end xl:-ml-8">
-          <LoanCalculator />
+        <div className="relative z-10 flex justify-center bg-card px-2 py-3 sm:px-3 sm:py-5 lg:px-4 lg:py-7">
+          <LoanCalculator embedded />
         </div>
       </div>
     </div>
