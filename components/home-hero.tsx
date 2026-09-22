@@ -59,8 +59,8 @@ export function HomeHero() {
           />
 
           <div className="relative z-10 flex h-full min-h-[22rem] flex-col justify-between gap-5 p-5 sm:min-h-[26rem] sm:p-7 lg:gap-8 lg:p-8 xl:px-10 xl:pt-8 xl:pb-8">
-            <div className="max-w-xl space-y-3 text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.35)]">
-              <h1 className="text-2xl font-bold leading-tight text-balance sm:text-3xl lg:text-4xl xl:text-5xl">
+            <div className="max-w-2xl space-y-3 text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.35)]">
+              <h1 className="text-2xl font-bold leading-[1.15] sm:text-3xl lg:text-4xl xl:text-[2.6rem] 2xl:text-5xl">
                 Okamžité finance jištěné
                 <span className="mt-1 block text-white/90">nemovitostí nebo vozem</span>
               </h1>
@@ -79,7 +79,7 @@ export function HomeHero() {
             </div>
 
             <div className="w-full max-w-md rounded-2xl border border-white/15 bg-slate-950/50 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-md sm:p-4">
-              <ul className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:gap-3.5">
+              <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1 lg:gap-3.5">
                 {benefits.map((benefit) => {
                   const Icon = benefit.icon
                   return (
