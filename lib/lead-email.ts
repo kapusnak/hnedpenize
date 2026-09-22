@@ -279,8 +279,8 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
   const domainTag = notifyDomainTag()
 
   const notifySubjectCore = callback
-    ? `Callback – ${phoneDisplay}`
-    : `Nová poptávka – ${name !== PLACEHOLDER ? name : phoneDisplay}`
+    ? `${phoneDisplay} – Callback`
+    : `${name !== PLACEHOLDER ? name : phoneDisplay} – Nová poptávka`
   const notifySubject = `[${domainTag}] ${notifySubjectCore}`
 
   const notifyText = [
