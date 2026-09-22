@@ -170,15 +170,45 @@
   animation: slide-in-bottom 0.35s ease-out forwards;
 }
 
-/* Soft blend of the hero photo into the form — Autocash-style, form-facing edge only. */
+/* Soft blend of the hero photo into the form — Autocash-style, form-facing edge only.
+   Fade starts late so the villa stays visible through the copy/perk gap; the ramp
+   is long so the photo dissolves into white instead of ending in a hard stripe. */
 .hero-house-blend {
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 70%,
+    rgba(0, 0, 0, 0.72) 82%,
+    rgba(0, 0, 0, 0.32) 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 70%,
+    rgba(0, 0, 0, 0.72) 82%,
+    rgba(0, 0, 0, 0.32) 92%,
+    transparent 100%
+  );
 }
 
 @media (min-width: 1024px) {
   .hero-house-blend {
-    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 58%, #000 78%, transparent 100%);
-    mask-image: linear-gradient(to right, #000 0%, #000 58%, #000 78%, transparent 100%);
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 0%,
+      #000 62%,
+      #000 76%,
+      rgba(0, 0, 0, 0.5) 90%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      #000 0%,
+      #000 62%,
+      #000 76%,
+      rgba(0, 0, 0, 0.5) 90%,
+      transparent 100%
+    );
   }
 }
