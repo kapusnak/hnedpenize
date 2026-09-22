@@ -36,9 +36,9 @@ export function HomeHero() {
             alt="Moderní rodinný dům"
             fill
             priority
-            quality={85}
+            quality={90}
             sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 62vw, min(58vw, 1100px)"
-            className="hero-house-blend object-cover object-[46%_50%] saturate-[1.12] contrast-[1.04] sm:object-[48%_48%] lg:object-[42%_46%]"
+            className="hero-house-blend object-cover object-[46%_50%] saturate-[1.08] contrast-[1.02] sm:object-[48%_48%] lg:object-[42%_46%]"
           />
 
           {/* Contrast only where copy sits — the house stays saturated. */}
