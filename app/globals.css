@@ -169,3 +169,16 @@
 .animate-slide-in-bottom {
   animation: slide-in-bottom 0.35s ease-out forwards;
 }
+
+/* Soft blend of the hero photo into the form — Autocash-style, form-facing edge only. */
+.hero-house-blend {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+}
+
+@media (min-width: 1024px) {
+  .hero-house-blend {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 58%, #000 78%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 58%, #000 78%, transparent 100%);
+  }
+}
