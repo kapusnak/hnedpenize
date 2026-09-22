@@ -10,7 +10,7 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start -p ${PORT:-3000}",
-    "test": "node --experimental-strip-types --test lib/track-qr-letak.test.ts"
+    "test": "node --experimental-strip-types --test lib/track-qr-letak.test.ts lib/direct-ga-snippet.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

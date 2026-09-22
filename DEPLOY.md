@@ -33,7 +33,7 @@ Nastavte hodnoty podle `.env.example`:
 
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_GTM_ID`
-- `NEXT_PUBLIC_GA_MEASUREMENT_ID` — hybrid (GTM + Ads gtag): pouze measurement ID pro `send_to` u `qr_letak` (např. `G-E130YBV2R0`). GTM dál vlastní `page_view`. Komponenta `GoogleAnalytics` při nastaveném GTM nenačítá druhý `gtag('config')`. GTM tag `GA4 - qr_letak` nechte paused.
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` — hybrid (GTM + Ads gtag): measurement ID pro tichý `gtag('config', id, { send_page_view: false })` a `send_to` u `qr_letak` (např. `G-E130YBV2R0`). Musí být dostupné při **buildu**, Next ho inlineuje. GTM dál vlastní `page_view`. Komponenta `GoogleAnalytics` při nastaveném GTM nenačítá druhý page_view snippet. GTM tag `GA4 - qr_letak` nechte paused.
 - volitelně další Google Ads proměnné
 
 `NEXT_PUBLIC_*` musí být dostupné i při **buildu**.

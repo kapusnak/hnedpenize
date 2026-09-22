@@ -133,6 +133,17 @@ afterEach(() => {
   Date.now = realDateNow
 })
 
+function dataLayerHasQrLetak(dataLayer: unknown[]): boolean {
+  return dataLayer.some((entry) => {
+    if (entry === GA_EVENT_QR_LETAK) return true
+    if (!entry || typeof entry !== "object") return false
+    const record = entry as Record<string, unknown>
+    if (record.event === GA_EVENT_QR_LETAK) return true
+    if (Array.isArray(entry) && entry[1] === GA_EVENT_QR_LETAK) return true
+    return false
+  })
+}
+
 test("trackQrLetakScan sends only gtag event, not a dataLayer Custom Event", () => {
   const calls: GtagCall[] = []
   installWindow((...args) => {
@@ -141,10 +152,10 @@ test("trackQrLetakScan sends only gtag event, not a dataLayer Custom Event", () 
 
   trackQrLetakScan()
 
-  assert.equal(
-    (globalThis as { window: { dataLayer: unknown[] } }).window.dataLayer.length,
-    0,
-  )
+  const dataLayer = (globalThis as { window: { dataLayer: unknown[] } }).window
+    .dataLayer
+  assert.equal(dataLayer.length, 0)
+  assert.equal(dataLayerHasQrLetak(dataLayer), false)
   assert.deepEqual(calls[0]?.[0], "set")
   assert.equal(calls[1]?.[0], "event")
   assert.equal(calls[1]?.[1], GA_EVENT_QR_LETAK)
@@ -156,9 +167,13 @@ test("trackQrLetakScan sends only gtag event, not a dataLayer Custom Event", () 
   assert.equal(params.event_timeout, EVENT_HANDOFF_MS)
   assert.equal(params.transport_type, "beacon")
   assert.equal("send_to" in params, false)
+  assert.equal(
+    calls.some((call) => call[0] === "config"),
+    false,
+  )
 })
 
-test("trackQrLetakScan sets send_to from NEXT_PUBLIC_GA_MEASUREMENT_ID", () => {
+test("trackQrLetakScan configs GA4 once then events with send_to", () => {
   process.env[GA_ENV] = "G-E130YBV2R0"
   const calls: GtagCall[] = []
   installWindow((...args) => {
@@ -167,10 +182,33 @@ test("trackQrLetakScan sets send_to from NEXT_PUBLIC_GA_MEASUREMENT_ID", () => {
 
   trackQrLetakScan()
 
+  assert.equal(calls[0]?.[0], "set")
+  assert.equal(calls[1]?.[0], "config")
+  assert.equal(calls[1]?.[1], "G-E130YBV2R0")
+  assert.deepEqual(calls[1]?.[2], { send_page_view: false })
+  assert.equal(calls[2]?.[0], "event")
+  assert.equal(calls[2]?.[1], GA_EVENT_QR_LETAK)
+
   const params = eventParams(calls)
   assert.equal(params.send_to, "G-E130YBV2R0")
   assert.equal(params.transport_type, "beacon")
   assert.equal(typeof params.event_callback, "function")
+  assert.equal(params.event_timeout, EVENT_HANDOFF_MS)
+  assert.equal(params.campaign_source, QR_LETAK_CAMPAIGN.campaign_source)
+  assert.equal(
+    dataLayerHasQrLetak(
+      (globalThis as { window: { dataLayer: unknown[] } }).window.dataLayer,
+    ),
+    false,
+  )
+
+  trackQrLetakScan()
+  const configs = calls.filter((call) => call[0] === "config")
+  const events = calls.filter((call) => call[0] === "event")
+  assert.equal(configs.length, 1)
+  assert.equal(events.length, 2)
+  assert.equal(events[1]?.[1], GA_EVENT_QR_LETAK)
+  assert.equal((events[1]?.[2] as Record<string, unknown>).send_to, "G-E130YBV2R0")
 })
 
 test("trackQrLetakScan waits for event_callback before onDone and clears pending", () => {
@@ -320,6 +358,6 @@ test("consumePendingQrLetakScan replays via gtag when /qr left pending", () => {
   )
   markQrLetakPending()
   consumePendingQrLetakScan()
-  assert.equal(calls[1]?.[0], "event")
-  assert.equal(calls[1]?.[1], GA_EVENT_QR_LETAK)
+  const event = calls.find((call) => call[0] === "event")
+  assert.equal(event?.[1], GA_EVENT_QR_LETAK)
 })
