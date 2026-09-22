@@ -36,7 +36,8 @@ export function HomeHero() {
             alt="Moderní rodinný dům"
             fill
             priority
-            sizes="(max-width: 1023px) 100vw, 65vw"
+            quality={85}
+            sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 62vw, min(58vw, 1100px)"
             className="hero-house-blend object-cover object-[46%_50%] saturate-[1.12] contrast-[1.04] sm:object-[48%_48%] lg:object-[42%_46%]"
           />
 
@@ -57,7 +58,7 @@ export function HomeHero() {
                 Okamžité finance jištěné
                 <span className="mt-1 block text-white/90">nemovitostí nebo vozem</span>
               </h1>
-              <p className="hidden max-w-lg text-sm leading-relaxed text-white/80 sm:block lg:text-base">
+              <p className="max-w-lg text-sm leading-relaxed text-white/80 lg:text-base">
                 Získejte potřebnou hotovost do 24 hodin a svůj majetek využívejte dál bez omezení. Diskrétní řešení pro
                 podnikatele i soukromé osoby s vysokou průchodností schválení.
               </p>
