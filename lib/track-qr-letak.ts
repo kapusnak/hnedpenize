@@ -53,6 +53,23 @@ function gaMeasurementId(): string | undefined {
   return id || undefined
 }
 
+/**
+ * `send_to` only delivers after the measurement ID is registered with
+ * `gtag('config')`. Ads `AW-…` config is not enough. GTM still owns
+ * page_view — this call is destination-only.
+ */
+function ensureGa4Configured(gtag: (...args: unknown[]) => void): string | undefined {
+  const sendTo = gaMeasurementId()
+  if (!sendTo) return undefined
+
+  const page = window as typeof window & { __hnedpenizeGa4QrConfigured?: boolean }
+  if (!page.__hnedpenizeGa4QrConfigured) {
+    page.__hnedpenizeGa4QrConfigured = true
+    gtag("config", sendTo, { send_page_view: false })
+  }
+  return sendTo
+}
+
 function gtagCampaign(): {
   source: string
   medium: string
@@ -93,9 +110,9 @@ function hasQrLetakPending(): boolean {
  * Records exactly one flyer QR scan via `gtag('event', 'qr_letak')`.
  * Does not push a GTM Custom Event on dataLayer (avoids a second GA4 hit
  * while the container tag `GA4 - qr_letak` is still live / being paused).
- * Does not call `gtag('config')` — GTM still owns page_view.
- * When `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, `send_to` targets that
- * property so hybrid Ads+GTM gtag does not drop the event.
+ * When `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, registers that destination
+ * once with `gtag('config', id, { send_page_view: false })` then fires
+ * the event with `send_to`. GTM still owns page_view.
  */
 export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_MS): void {
   if (typeof window === "undefined") {
@@ -116,9 +133,9 @@ export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_
   }
 
   const timer = window.setTimeout(succeed, timeoutMs)
-  const sendTo = gaMeasurementId()
 
   gtag("set", { campaign: gtagCampaign() })
+  const sendTo = ensureGa4Configured(gtag)
   gtag("event", GA_EVENT_QR_LETAK, {
     ...QR_LETAK_CAMPAIGN,
     ...(sendTo ? { send_to: sendTo } : {}),
