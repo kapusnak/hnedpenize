@@ -1,13 +1,26 @@
 "use client"
 
 import { useEffect } from "react"
-import { consumePendingQrLetakScan } from "@/lib/track-qr-letak"
+import {
+  consumePendingQrLetakScan,
+  consumePendingQrPostaScan,
+  QR_LETAK_PATH,
+  QR_POSTA_PATH,
+} from "@/lib/track-qr-letak"
 
-/** Replays `qr_letak` once if `/qr` never handed the event off via gtag. */
+/**
+ * Replays a flyer QR event once if its landing never handed the event off
+ * via gtag. Each landing skips its own replay so a refresh cannot double-count.
+ */
 export function QrLetakReplay() {
   useEffect(() => {
-    if (window.location.pathname === "/qr") return
-    consumePendingQrLetakScan()
+    const path = window.location.pathname
+    // `/qr` owns `qr_letak`. Returning here keeps that page on the proven path.
+    if (path === QR_LETAK_PATH) return
+    if (path !== QR_POSTA_PATH) consumePendingQrLetakScan()
+    // `/qrposta` owns `qr_posta`.
+    if (path === QR_POSTA_PATH) return
+    consumePendingQrPostaScan()
   }, [])
   return null
 }

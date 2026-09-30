@@ -1,5 +1,8 @@
-/** Exact event name shared with sibling flyer QR landings — do not rename. */
+/** Field-leaflet QR. Do not rename — `/qr` and GA4 depend on this exact name. */
 export const GA_EVENT_QR_LETAK = "qr_letak"
+
+/** Postal-leaflet QR. Must stay distinct from `qr_letak`. */
+export const GA_EVENT_QR_POSTA = "qr_posta"
 
 export const QR_LETAK_CAMPAIGN = {
   campaign_source: "letak",
@@ -7,7 +10,43 @@ export const QR_LETAK_CAMPAIGN = {
   campaign_name: "letak_print",
 } as const
 
+export const QR_POSTA_CAMPAIGN = {
+  campaign_source: "posta",
+  campaign_medium: "qr",
+  campaign_name: "posta_print",
+} as const
+
 export const QR_LETAK_PENDING_KEY = "qr_letak_pending"
+export const QR_POSTA_PENDING_KEY = "qr_posta_pending"
+
+export const QR_LETAK_PATH = "/qr"
+export const QR_POSTA_PATH = "/qrposta"
+
+type QrFlyerCampaign = {
+  campaign_source: string
+  campaign_medium: string
+  campaign_name: string
+}
+
+type QrFlyerSpec = {
+  eventName: string
+  campaign: QrFlyerCampaign
+  pendingKey: string
+}
+
+const QR_LETAK_SPEC: QrFlyerSpec = {
+  eventName: GA_EVENT_QR_LETAK,
+  campaign: QR_LETAK_CAMPAIGN,
+  pendingKey: QR_LETAK_PENDING_KEY,
+}
+
+const QR_POSTA_SPEC: QrFlyerSpec = {
+  eventName: GA_EVENT_QR_POSTA,
+  campaign: QR_POSTA_CAMPAIGN,
+  pendingKey: QR_POSTA_PENDING_KEY,
+}
+
+export type QrFlyerVariant = "letak" | "posta"
 
 /**
  * Wait for a real GTM/GA4 gtag — not Ads-only `window.gtag`.
@@ -70,51 +109,71 @@ function ensureGa4Configured(gtag: (...args: unknown[]) => void): string | undef
   return sendTo
 }
 
-function gtagCampaign(): {
+function gtagCampaign(campaign: QrFlyerCampaign): {
   source: string
   medium: string
   name: string
 } {
   return {
-    source: QR_LETAK_CAMPAIGN.campaign_source,
-    medium: QR_LETAK_CAMPAIGN.campaign_medium,
-    name: QR_LETAK_CAMPAIGN.campaign_name,
+    source: campaign.campaign_source,
+    medium: campaign.campaign_medium,
+    name: campaign.campaign_name,
   }
 }
 
-export function markQrLetakPending(): void {
+function markPending(key: string): void {
   try {
-    sessionStorage.setItem(QR_LETAK_PENDING_KEY, "1")
+    sessionStorage.setItem(key, "1")
   } catch {
     /* ignore quota / private mode */
   }
 }
 
-export function clearQrLetakPending(): void {
+function clearPending(key: string): void {
   try {
-    sessionStorage.removeItem(QR_LETAK_PENDING_KEY)
+    sessionStorage.removeItem(key)
   } catch {
     /* ignore */
   }
 }
 
-function hasQrLetakPending(): boolean {
+function hasPending(key: string): boolean {
   try {
-    return sessionStorage.getItem(QR_LETAK_PENDING_KEY) === "1"
+    return sessionStorage.getItem(key) === "1"
   } catch {
     return false
   }
 }
 
+export function markQrLetakPending(): void {
+  markPending(QR_LETAK_SPEC.pendingKey)
+}
+
+export function clearQrLetakPending(): void {
+  clearPending(QR_LETAK_SPEC.pendingKey)
+}
+
+export function markQrPostaPending(): void {
+  markPending(QR_POSTA_SPEC.pendingKey)
+}
+
+export function clearQrPostaPending(): void {
+  clearPending(QR_POSTA_SPEC.pendingKey)
+}
+
 /**
- * Records exactly one flyer QR scan via `gtag('event', 'qr_letak')`.
+ * Records exactly one flyer QR scan via `gtag('event', eventName)`.
  * Does not push a GTM Custom Event on dataLayer (avoids a second GA4 hit
- * while the container tag `GA4 - qr_letak` is still live / being paused).
+ * while a container tag for that event is still live / being paused).
  * When `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, registers that destination
  * once with `gtag('config', id, { send_page_view: false })` then fires
  * the event with `send_to`. GTM still owns page_view.
  */
-export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_MS): void {
+function trackQrFlyerScan(
+  spec: QrFlyerSpec,
+  onDone?: () => void,
+  timeoutMs = EVENT_HANDOFF_MS,
+): void {
   if (typeof window === "undefined") {
     onDone?.()
     return
@@ -122,7 +181,7 @@ export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_
 
   const go = finishOnce(onDone)
   const succeed = () => {
-    clearQrLetakPending()
+    clearPending(spec.pendingKey)
     go()
   }
 
@@ -134,10 +193,10 @@ export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_
 
   const timer = window.setTimeout(succeed, timeoutMs)
 
-  gtag("set", { campaign: gtagCampaign() })
+  gtag("set", { campaign: gtagCampaign(spec.campaign) })
   const sendTo = ensureGa4Configured(gtag)
-  gtag("event", GA_EVENT_QR_LETAK, {
-    ...QR_LETAK_CAMPAIGN,
+  gtag("event", spec.eventName, {
+    ...spec.campaign,
     ...(sendTo ? { send_to: sendTo } : {}),
     transport_type: "beacon",
     event_callback: () => {
@@ -148,11 +207,35 @@ export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_
   })
 }
 
+/** Records exactly one field-leaflet scan (`qr_letak`). */
+export function trackQrLetakScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_MS): void {
+  trackQrFlyerScan(QR_LETAK_SPEC, onDone, timeoutMs)
+}
+
+/** Records exactly one postal-leaflet scan (`qr_posta`). */
+export function trackQrPostaScan(onDone?: () => void, timeoutMs = EVENT_HANDOFF_MS): void {
+  trackQrFlyerScan(QR_POSTA_SPEC, onDone, timeoutMs)
+}
+
+export function trackQrFlyerVariant(
+  variant: QrFlyerVariant,
+  onDone?: () => void,
+  timeoutMs = EVENT_HANDOFF_MS,
+): void {
+  if (variant === "posta") trackQrPostaScan(onDone, timeoutMs)
+  else trackQrLetakScan(onDone, timeoutMs)
+}
+
+export function markQrFlyerPending(variant: QrFlyerVariant): void {
+  if (variant === "posta") markQrPostaPending()
+  else markQrLetakPending()
+}
+
 /**
  * Wait until `window.gtag` is a function **and** the GTM container is ready
  * (`google_tag_manager` or a `gtm.load` dataLayer entry). Ads-only gtag is
- * not sufficient. Still invokes `onReady` after `waitMs` so `/qr` is never
- * stuck on loading.
+ * not sufficient. Still invokes `onReady` after `waitMs` so the landing is
+ * never stuck on loading.
  */
 export function whenGtagReady(onReady: () => void, waitMs = GTAG_READY_MS): void {
   if (typeof window === "undefined") {
@@ -172,12 +255,21 @@ export function whenGtagReady(onReady: () => void, waitMs = GTAG_READY_MS): void
   }, 50)
 }
 
+function consumePendingQrFlyerScan(spec: QrFlyerSpec): void {
+  if (typeof window === "undefined") return
+  if (!hasPending(spec.pendingKey)) return
+  whenGtagReady(() => {
+    if (!hasPending(spec.pendingKey)) return
+    trackQrFlyerScan(spec)
+  })
+}
+
 /** Homepage safety net: only if `/qr` never successfully handed off via gtag. */
 export function consumePendingQrLetakScan(): void {
-  if (typeof window === "undefined") return
-  if (!hasQrLetakPending()) return
-  whenGtagReady(() => {
-    if (!hasQrLetakPending()) return
-    trackQrLetakScan()
-  })
+  consumePendingQrFlyerScan(QR_LETAK_SPEC)
+}
+
+/** Homepage safety net: only if `/qrposta` never successfully handed off via gtag. */
+export function consumePendingQrPostaScan(): void {
+  consumePendingQrFlyerScan(QR_POSTA_SPEC)
 }
