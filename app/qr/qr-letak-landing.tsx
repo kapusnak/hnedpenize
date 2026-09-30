@@ -3,14 +3,19 @@
 import { useEffect } from "react"
 import { isCrawlerUserAgent } from "@/lib/crawler-user-agent"
 import {
-  markQrLetakPending,
-  trackQrLetakScan,
+  markQrFlyerPending,
+  trackQrFlyerVariant,
   whenGtagReady,
+  type QrFlyerVariant,
 } from "@/lib/track-qr-letak"
 
 const HOME_PATH = "/"
 
-export function QrLetakLanding() {
+export function QrLetakLanding({
+  variant = "letak",
+}: {
+  variant?: QrFlyerVariant
+} = {}) {
   useEffect(() => {
     let cancelled = false
 
@@ -23,17 +28,17 @@ export function QrLetakLanding() {
       return
     }
 
-    markQrLetakPending()
+    markQrFlyerPending(variant)
     whenGtagReady(() => {
       if (cancelled) return
       // Replace `/` only after gtag event_callback or the handoff timeout.
-      trackQrLetakScan(goHome)
+      trackQrFlyerVariant(variant, goHome)
     })
 
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [variant])
 
   return (
     <main className="min-h-dvh bg-gradient-to-b from-blue-400 via-primary to-blue-700 flex flex-col items-center justify-center px-4">
