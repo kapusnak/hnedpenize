@@ -195,7 +195,7 @@ test("trackQrLetakScan sends only gtag event, not a dataLayer Custom Event", () 
   assert.equal(params.campaign_name, QR_LETAK_CAMPAIGN.campaign_name)
   assert.equal(typeof params.event_callback, "function")
   assert.equal(params.event_timeout, EVENT_HANDOFF_MS)
-  assert.equal(params.transport_type, "beacon")
+  assert.equal("transport_type" in params, false)
   assert.equal("send_to" in params, false)
   assert.equal(
     calls.some((call) => call[0] === "config"),
@@ -221,7 +221,7 @@ test("trackQrLetakScan configs GA4 once then events with send_to", () => {
 
   const params = eventParams(calls)
   assert.equal(params.send_to, "G-E130YBV2R0")
-  assert.equal(params.transport_type, "beacon")
+  assert.equal("transport_type" in params, false)
   assert.equal(typeof params.event_callback, "function")
   assert.equal(params.event_timeout, EVENT_HANDOFF_MS)
   assert.equal(params.campaign_source, QR_LETAK_CAMPAIGN.campaign_source)
@@ -264,8 +264,116 @@ test("trackQrLetakScan waits for event_callback before onDone and clears pending
   assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), null)
 })
 
-test("trackQrLetakScan timeout still counts as gtag handoff (no homepage replay)", () => {
-  const clock = installWindow(() => {})
+test("Ads and GTM callbacks do not redirect; the GA4 callback does and is not replayed", () => {
+  process.env[GA_ENV] = "G-E130YBV2R0"
+  const calls: GtagCall[] = []
+  let callback: ((...args: unknown[]) => void) | undefined
+  installWindow(
+    (...args) => {
+      calls.push(args)
+      const params = args[2]
+      if (params && typeof params === "object" && "event_callback" in params) {
+        const cb = (params as { event_callback?: unknown }).event_callback
+        if (typeof cb === "function") callback = cb as (...args: unknown[]) => void
+      }
+    },
+    {
+      googleTagManager: {
+        "AW-17721640948": {},
+        "GTM-MJBCTMVT": {},
+        "G-E130YBV2R0": {},
+      },
+    },
+  )
+  markQrLetakPending()
+  markQrPostaPending()
+
+  let letakDone = false
+  trackQrLetakScan(() => {
+    letakDone = true
+  })
+
+  callback?.("AW-17721640948", { tags: [] })
+  callback?.("GTM-MJBCTMVT")
+  assert.equal(letakDone, false)
+  assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), "1")
+
+  callback?.("G-E130YBV2R0")
+  assert.equal(letakDone, true)
+  assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), null)
+  assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), "1")
+
+  consumePendingQrLetakScan()
+  let events = eventCalls(calls)
+  assert.equal(events.length, 1)
+  assert.equal(events[0]?.[1], GA_EVENT_QR_LETAK)
+
+  callback = undefined
+  let postaDone = false
+  trackQrPostaScan(() => {
+    postaDone = true
+  })
+  callback?.("AW-17721640948", { tags: [] })
+  callback?.("GTM-MJBCTMVT")
+  assert.equal(postaDone, false)
+  assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), "1")
+
+  callback?.("G-E130YBV2R0")
+  assert.equal(postaDone, true)
+  assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), null)
+
+  consumePendingQrPostaScan()
+  consumePendingQrLetakScan()
+  events = eventCalls(calls)
+  assert.deepEqual(
+    events.map((call) => call[1]),
+    [GA_EVENT_QR_LETAK, GA_EVENT_QR_POSTA],
+  )
+})
+
+test("a matching GA4 callback after timeout clears pending so replay does not double count", () => {
+  process.env[GA_ENV] = "G-E130YBV2R0"
+  const calls: GtagCall[] = []
+  let callback: ((...args: unknown[]) => void) | undefined
+  const clock = installWindow(
+    (...args) => {
+      calls.push(args)
+      const params = args[2]
+      if (params && typeof params === "object" && "event_callback" in params) {
+        const cb = (params as { event_callback?: unknown }).event_callback
+        if (typeof cb === "function") callback = cb as (...args: unknown[]) => void
+      }
+    },
+    { googleTagManager: { "G-E130YBV2R0": {} } },
+  )
+  markQrLetakPending()
+
+  let done = false
+  trackQrLetakScan(() => {
+    done = true
+  })
+
+  callback?.("AW-17721640948")
+  clock.flush(EVENT_HANDOFF_MS)
+  assert.equal(done, true)
+  assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), "1")
+
+  callback?.("G-E130YBV2R0")
+  assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), null)
+  consumePendingQrLetakScan()
+  const events = eventCalls(calls)
+  assert.equal(events.length, 1)
+  assert.equal(events[0]?.[1], GA_EVENT_QR_LETAK)
+})
+
+test("trackQrLetakScan timeout redirects but keeps pending for homepage replay", () => {
+  const calls: GtagCall[] = []
+  const clock = installWindow(
+    (...args) => {
+      calls.push(args)
+    },
+    { googleTagManager: {} },
+  )
   markQrLetakPending()
 
   let done = false
@@ -276,7 +384,12 @@ test("trackQrLetakScan timeout still counts as gtag handoff (no homepage replay)
   assert.equal(done, false)
   clock.flush(EVENT_HANDOFF_MS)
   assert.equal(done, true)
-  assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), null)
+  assert.equal(sessionStorage.getItem(QR_LETAK_PENDING_KEY), "1")
+
+  consumePendingQrLetakScan()
+  const events = eventCalls(calls)
+  assert.equal(events.length, 2)
+  assert.equal(events.every((call) => call[1] === GA_EVENT_QR_LETAK), true)
 })
 
 test("trackQrLetakScan without gtag does not clear pending", () => {
@@ -365,6 +478,52 @@ test("whenGtagReady treats dataLayer gtm.load as GTM container ready", () => {
   assert.equal(ready, true)
 })
 
+test("whenGtagReady does not treat Ads-only google_tag_manager as ready", () => {
+  const clock = installWindow(() => {}, {
+    googleTagManager: { "AW-17721640948": {} },
+  })
+  let ready = false
+  whenGtagReady(() => {
+    ready = true
+  }, 1000)
+
+  assert.equal(ready, false)
+  clock.flush(50)
+  assert.equal(ready, false)
+
+  const win = globalThis as {
+    window: { google_tag_manager?: Record<string, unknown> }
+  }
+  win.window.google_tag_manager = {
+    "AW-17721640948": {},
+    "GTM-MJBCTMVT": {},
+  }
+  clock.flush(50)
+  assert.equal(ready, true)
+})
+
+test("whenGtagReady waits for the GA4 destination, ignoring Ads, GTM, and gtm.load", () => {
+  process.env[GA_ENV] = "G-E130YBV2R0"
+  const tagManager: Record<string, unknown> = {
+    "AW-17721640948": {},
+    "GTM-MJBCTMVT": {},
+  }
+  const clock = installWindow(() => {}, { googleTagManager: tagManager })
+  let ready = false
+  whenGtagReady(() => {
+    ready = true
+  }, 1000)
+
+  const win = globalThis as { window: { dataLayer: unknown[] } }
+  win.window.dataLayer.push({ event: "gtm.load" })
+  clock.flush(50)
+  assert.equal(ready, false)
+
+  tagManager["G-E130YBV2R0"] = {}
+  clock.flush(50)
+  assert.equal(ready, true)
+})
+
 test("consumePendingQrLetakScan no-ops when pending was already cleared", () => {
   const calls: GtagCall[] = []
   installWindow(
@@ -431,7 +590,7 @@ test("trackQrPostaScan sends exactly one qr_posta, never qr_letak or a dataLayer
   assert.equal(params.campaign_name, QR_POSTA_CAMPAIGN.campaign_name)
   assert.equal(typeof params.event_callback, "function")
   assert.equal(params.event_timeout, EVENT_HANDOFF_MS)
-  assert.equal(params.transport_type, "beacon")
+  assert.equal("transport_type" in params, false)
   assert.equal("send_to" in params, false)
   assert.equal(
     calls.some((call) => call[0] === "config"),
@@ -457,7 +616,7 @@ test("trackQrPostaScan configs GA4 once then events with send_to", () => {
 
   const params = eventParams(calls)
   assert.equal(params.send_to, "G-E130YBV2R0")
-  assert.equal(params.transport_type, "beacon")
+  assert.equal("transport_type" in params, false)
   assert.equal(typeof params.event_callback, "function")
   assert.equal(params.event_timeout, EVENT_HANDOFF_MS)
   assert.equal(params.campaign_source, QR_POSTA_CAMPAIGN.campaign_source)
@@ -555,8 +714,27 @@ test("trackQrLetakScan handoff does not clear a pending postal scan", () => {
   assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), "1")
 })
 
-test("trackQrPostaScan timeout still counts as gtag handoff (no homepage replay)", () => {
-  const clock = installWindow(() => {})
+test("trackQrPostaScan timeout redirects but keeps pending for homepage replay", () => {
+  const calls: GtagCall[] = []
+  const callbacks: Array<(...args: unknown[]) => void> = []
+  const clock = installWindow(
+    (...args) => {
+      calls.push(args)
+      const params = args[2]
+      if (params && typeof params === "object" && "event_callback" in params) {
+        const cb = (params as { event_callback?: unknown }).event_callback
+        if (typeof cb === "function") callbacks.push(cb as (...args: unknown[]) => void)
+      }
+    },
+    {
+      googleTagManager: {
+        "AW-17721640948": {},
+        "GTM-MJBCTMVT": {},
+        "G-E130YBV2R0": {},
+      },
+    },
+  )
+  process.env[GA_ENV] = "G-E130YBV2R0"
   markQrPostaPending()
 
   let done = false
@@ -564,10 +742,29 @@ test("trackQrPostaScan timeout still counts as gtag handoff (no homepage replay)
     done = true
   })
 
+  callbacks[0]?.("AW-17721640948", { tags: [] })
+  callbacks[0]?.("GTM-MJBCTMVT")
   assert.equal(done, false)
+  assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), "1")
+
   clock.flush(EVENT_HANDOFF_MS)
   assert.equal(done, true)
+  assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), "1")
+
+  consumePendingQrPostaScan()
+  assert.equal(eventCalls(calls).length, 2)
+
+  callbacks[1]?.("AW-17721640948")
+  callbacks[1]?.("GTM-MJBCTMVT")
+  assert.equal(eventCalls(calls).length, 2)
+  assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), "1")
+
+  callbacks[1]?.("G-E130YBV2R0")
   assert.equal(sessionStorage.getItem(QR_POSTA_PENDING_KEY), null)
+  consumePendingQrPostaScan()
+  const events = eventCalls(calls)
+  assert.equal(events.length, 2)
+  assert.equal(events.every((call) => call[1] === GA_EVENT_QR_POSTA), true)
 })
 
 test("trackQrPostaScan without gtag does not clear pending", () => {
