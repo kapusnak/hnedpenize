@@ -49,9 +49,9 @@ const QR_POSTA_SPEC: QrFlyerSpec = {
 export type QrFlyerVariant = "letak" | "posta"
 
 /**
- * Wait for the GA4 destination — not Ads-only `window.gtag` /
- * `google_tag_manager`. Hybrid pages load Google Ads (`AW-…`) first;
- * that object exists before `G-…` is configured.
+ * Wait until the event can be queued behind a real GTM container — not
+ * Ads-only `window.gtag` / `google_tag_manager`. Hybrid pages load Google
+ * Ads (`AW-…`) first; that object exists before GTM configures GA4.
  */
 export const GTAG_READY_MS = 2000
 /** Fallback if the GA4 `event_callback` never runs after `gtag('event', ...)`. */
@@ -96,21 +96,17 @@ function isAdsOnlyTagManager(gtm: Record<string, unknown>): boolean {
   return ids.length > 0 && ids.every((id) => ADS_CONTAINER_ID.test(id))
 }
 
-function isGa4DestinationLoaded(measurementId: string): boolean {
-  const gtm = tagManagerRecord()
-  if (!gtm) return false
-  return Object.prototype.hasOwnProperty.call(gtm, measurementId)
-}
-
 /**
- * With a measurement id, ready only when that destination is loaded.
- * Without one, any non-Ads container (or `gtm.load`) counts. An Ads-only
- * `google_tag_manager` does not.
+ * Ready when a non-Ads container is present, or GTM has reached `gtm.load`.
+ * An Ads-only `google_tag_manager` (`AW-…`) is not enough.
+ *
+ * Do not wait for the GA4 measurement id to already be a key. Calling
+ * `gtag('event')` only after `G-…` is registered makes that container
+ * answer `event_callback` immediately with `{tags:[]}` and drop the hit.
+ * Queuing while the destination is still loading lets GA4 send it, then
+ * the later `send_to` callback confirms.
  */
 function isGtmContainerReady(): boolean {
-  const measurementId = gaMeasurementId()
-  if (measurementId) return isGa4DestinationLoaded(measurementId)
-
   const gtm = tagManagerRecord()
   if (gtm && !isAdsOnlyTagManager(gtm)) return true
   return dataLayerHasGtmLoad()
@@ -270,10 +266,9 @@ export function markQrFlyerPending(variant: QrFlyerVariant): void {
 }
 
 /**
- * Wait until `window.gtag` is a function and the GA4 destination is loaded
- * (`google_tag_manager[measurementId]`). Ads-only `google_tag_manager`
- * (`AW-…`) is not sufficient. Without a measurement id, a non-Ads container
- * or a `gtm.load` dataLayer entry counts. Still invokes `onReady` after
+ * Wait until `window.gtag` is a function and a non-Ads container is present
+ * (`GTM-…` / `G-…`, or a `gtm.load` dataLayer entry). Ads-only
+ * `google_tag_manager` is not sufficient. Still invokes `onReady` after
  * `waitMs` so the landing is never stuck on loading.
  */
 export function whenGtagReady(onReady: () => void, waitMs = GTAG_READY_MS): void {
@@ -291,7 +286,7 @@ export function whenGtagReady(onReady: () => void, waitMs = GTAG_READY_MS): void
       window.clearInterval(id)
       onReady()
     }
-  }, 50)
+  }, 10)
 }
 
 function consumePendingQrFlyerScan(spec: QrFlyerSpec): void {

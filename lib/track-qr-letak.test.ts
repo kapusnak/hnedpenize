@@ -502,24 +502,27 @@ test("whenGtagReady does not treat Ads-only google_tag_manager as ready", () => 
   assert.equal(ready, true)
 })
 
-test("whenGtagReady waits for the GA4 destination, ignoring Ads, GTM, and gtm.load", () => {
+test("whenGtagReady with a measurement id still ignores Ads-only and accepts GTM", () => {
   process.env[GA_ENV] = "G-E130YBV2R0"
-  const tagManager: Record<string, unknown> = {
-    "AW-17721640948": {},
-    "GTM-MJBCTMVT": {},
-  }
-  const clock = installWindow(() => {}, { googleTagManager: tagManager })
+  const clock = installWindow(() => {}, {
+    googleTagManager: { "AW-17721640948": {} },
+  })
   let ready = false
   whenGtagReady(() => {
     ready = true
   }, 1000)
 
-  const win = globalThis as { window: { dataLayer: unknown[] } }
-  win.window.dataLayer.push({ event: "gtm.load" })
+  assert.equal(ready, false)
   clock.flush(50)
   assert.equal(ready, false)
 
-  tagManager["G-E130YBV2R0"] = {}
+  const win = globalThis as {
+    window: { google_tag_manager?: Record<string, unknown> }
+  }
+  win.window.google_tag_manager = {
+    "AW-17721640948": {},
+    "GTM-MJBCTMVT": {},
+  }
   clock.flush(50)
   assert.equal(ready, true)
 })
