@@ -85,17 +85,15 @@ export function LeadPopup() {
 
   return (
     <>
-      {/* Backdrop for mobile - subtle overlay */}
+      {/* Backdrop for mobile — below the cookie bar so „Rozumím“ stays clickable */}
       <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={handleClose} />
 
-      {/* Popup */}
+      {/* Popup sits above the cookie bar via --hnedpenize-popup-bottom-* */}
       <div
         className={`
-          fixed z-50
-          /* Mobile: bottom sheet, slide in from bottom */
-          bottom-0 left-0 right-0 max-h-[33vh] animate-slide-in-bottom
-          /* Desktop: floating card bottom-right, no slide animation */
-          lg:bottom-6 lg:right-6 lg:left-auto lg:max-h-none lg:w-[380px] lg:animate-none
+          fixed z-[52]
+          bottom-[var(--hnedpenize-popup-bottom-mob,0px)] left-0 right-0 max-h-[33vh] animate-slide-in-bottom
+          lg:bottom-[var(--hnedpenize-popup-bottom-lg,1.5rem)] lg:right-6 lg:left-auto lg:max-h-none lg:w-[380px] lg:animate-none
           bg-primary rounded-t-2xl lg:rounded-2xl shadow-2xl
           transition-all duration-300 ease-out
           ${shouldShake ? "animate-shake" : ""}
