@@ -1,10 +1,10 @@
+import Link from "next/link"
 import { Header } from "@/components/header"
 import { HomeHero } from "@/components/home-hero"
-import { LeadPopup } from "@/components/lead-popup"
 import { WhatsAppCard } from "@/components/whatsapp-card"
 import { ZivefirmyBadge } from "@/components/zivefirmy-badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { HomeIcon, Phone, Mail, Clock, Facebook, Instagram, Car } from "lucide-react"
+import { HomeIcon, Phone, Mail, Clock, Facebook, Instagram, Car, FileText, Cookie } from "lucide-react"
 
 const SOCIAL = {
   facebook: "https://www.facebook.com/share/159JsQe6Qg/",
@@ -14,7 +14,6 @@ const SOCIAL = {
 export default function Home() {
   return (
     <main className="flex min-h-dvh flex-col bg-background">
-      <LeadPopup />
       <Header />
 
       <section className="relative flex flex-1 flex-col">
@@ -131,6 +130,34 @@ export default function Home() {
           </Card>
         </div>
       </section>
+
+      <footer className="py-8 bg-background border-t border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
+            <Link
+              href="/ochrana-osobnich-udaju/nemovitosti"
+              className="hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Ochrana osobních údajů - Nemovitosti
+            </Link>
+            <Link
+              href="/ochrana-osobnich-udaju/vozidla"
+              className="hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Ochrana osobních údajů - Vozidla
+            </Link>
+            <Link href="/zasady-cookies" className="hover:text-primary transition-colors flex items-center gap-2">
+              <Cookie className="w-4 h-4" />
+              Zásady cookies
+            </Link>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-6">
+            © 2026 Dočasný výkup s.r.o. Všechna práva vyhrazena.
+          </p>
+        </div>
+      </footer>
     </main>
   )
 }
