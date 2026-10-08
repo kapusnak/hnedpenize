@@ -18,7 +18,7 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
             Prohlášení o ochraně osobních údajů - nemovitosti
           </h1>
-          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 7. května 2026</p>
+          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 8. 10. 2026</p>
         </div>
       </section>
 
@@ -41,7 +41,8 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
               2. Jaké osobní údaje zpracováváme
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
-              Pro účely zpracování poptávky prostřednictvím našeho webového formuláře zpracováváme následující údaje:
+              Pro účely zpracování poptávky prostřednictvím webového formuláře, telefonické či e-mailové komunikace
+              zpracováváme následující údaje:
             </p>
             <ul className="list-disc pl-6 text-base text-muted-foreground leading-relaxed space-y-2 mb-6">
               <li>Jméno a příjmení</li>
@@ -55,18 +56,55 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
                 zájmu dle čl. 6 odst. 1 písm. f) GDPR)
               </li>
             </ul>
+            <p className="text-base text-muted-foreground leading-relaxed mb-4">
+              Z veřejně dostupných zdrojů a veřejných evidencí můžeme dále zpracovávat základní identifikační a adresní
+              údaje pro zaslání nabídky našich služeb poštou, zejména:
+            </p>
+            <ul className="list-disc pl-6 text-base text-muted-foreground leading-relaxed space-y-2 mb-6">
+              <li>Jméno a příjmení</li>
+              <li>Adresa</li>
+              <li>Základní veřejně dostupné údaje vztahující se k nemovitosti</li>
+            </ul>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">3. Jak vaše údaje získáváme</h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
-              Vaše osobní údaje získáváme výhradně prostřednictvím webového formuláře na našich stránkách.
+              Osobní údaje získáváme přímo od Vás prostřednictvím webových formulářů, telefonické či e-mailové
+              komunikace a dále z veřejně dostupných zdrojů a veřejných evidencí, zejména z katastru nemovitostí, ARES,
+              veřejných rejstříků, živnostenského rejstříku, insolvenčního rejstříku a dalších zákonně zveřejňovaných
+              zdrojů.
             </p>
 
+            <h2 id="postovni-nabidky" className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">
+              4. Poštovní nabídky a veřejně dostupné zdroje
+            </h2>
+            <p className="text-base text-muted-foreground leading-relaxed mb-4">
+              Základní identifikační a adresní údaje získané z veřejně dostupných zdrojů a veřejných evidencí můžeme v
+              případech, kdy jsou splněny zákonné podmínky, zpracovávat také za účelem zaslání nabídky našich služeb
+              poštou. Jedná se zejména o jméno, příjmení, adresu a základní veřejně dostupné údaje vztahující se k
+              nemovitosti. Právním základem zpracování je oprávněný zájem správce na přímém marketingu dle čl. 6 odst. 1
+              písm. f) GDPR.
+            </p>
+            <div className="rounded-xl border border-primary/30 bg-primary/5 px-5 py-4 md:px-6 md:py-5 mb-6">
+              <p className="text-base font-bold text-foreground leading-relaxed">
+                Máte právo kdykoliv a bezplatně vznést námitku proti zpracování osobních údajů pro účely přímého
+                marketingu. Po uplatnění námitky nebudou Vaše osobní údaje pro tento účel dále zpracovávány.
+              </p>
+              <p className="text-base font-medium text-foreground leading-relaxed mt-3">
+                Námitku můžete uplatnit e-mailem na{" "}
+                <a href="mailto:info@hnedpenize.cz" className="text-primary no-underline hover:underline">
+                  info@hnedpenize.cz
+                </a>{" "}
+                nebo dopisem na adresu správce Podvesná VII/6192, 760 01 Zlín.
+              </p>
+            </div>
+
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">
-              4. Účely a právní základ zpracování
+              5. Účely a právní základ zpracování
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
               Vaše údaje slouží k posouzení, zprostředkování a vytvoření nabídky na služby zajištěného financování
-              nemovitostí.
+              nemovitostí. Základní údaje z veřejně dostupných zdrojů můžeme také zpracovávat za účelem zaslání nabídky
+              našich služeb poštou.
             </p>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">Vaše osobní údaje zpracováváme na základě:</p>
             <ul className="list-disc pl-6 text-base text-muted-foreground leading-relaxed space-y-2 mb-6">
@@ -78,23 +116,27 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
                 čl. 6 odst. 1 písm. f) GDPR - oprávněný zájem Provozovatele na komunikaci se zákazníkem a zajištění
                 provozu služeb.
               </li>
+              <li>
+                čl. 6 odst. 1 písm. f) GDPR - oprávněný zájem správce na přímém marketingu (zaslání nabídky služeb
+                poštou).
+              </li>
             </ul>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">
-              5. Předání osobních údajů třetím stranám
+              6. Předání osobních údajů třetím stranám
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
               Údaje z poptávek zajištěných nemovitostí nepředáváme třetím stranám, s výjimkou případů, kdy nám to
               ukládá právní předpis.
             </p>
 
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">6. Doba uchování údajů</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">7. Doba uchování údajů</h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
               Osobní údaje jsou uchovávány po dobu nezbytně nutnou ke zprostředkování nabídky a komunikaci s klientem,
               nejdéle však po dobu 6 měsíců, pokud nebude zahájena smluvní spolupráce.
             </p>
 
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">7. Cookies a online sledování</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">8. Cookies a online sledování</h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">Na našem webu používáme následující typy cookies:</p>
             <ul className="list-disc pl-6 text-base text-muted-foreground leading-relaxed space-y-2 mb-6">
               <li>Analytické cookies - Google Analytics (sledování návštěvnosti).</li>
@@ -109,13 +151,13 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
               .
             </p>
 
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">8. Zabezpečení údajů</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">9. Zabezpečení údajů</h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
               Přijali jsme odpovídající technická a organizační opatření, aby vaše údaje byly v bezpečí a nebyly
               zneužity, ztraceny nebo neoprávněně zpřístupněny.
             </p>
 
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">9. Vaše práva</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">10. Vaše práva</h2>
             <ul className="list-disc pl-6 text-base text-muted-foreground leading-relaxed space-y-2 mb-6">
               <li>právo na přístup k osobním údajům,</li>
               <li>právo na opravu nepřesných údajů,</li>
@@ -132,7 +174,7 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
               </li>
             </ul>
 
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">10. Kontakt na Provozovatele</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">11. Kontakt na Provozovatele</h2>
             <ul className="list-none pl-0 text-base text-muted-foreground leading-relaxed space-y-2">
               <li>+420 777 400 256</li>
               <li>
