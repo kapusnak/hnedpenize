@@ -18,7 +18,7 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
             Prohlášení o ochraně osobních údajů - nemovitosti
           </h1>
-          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 8. 10. 2026</p>
+          <p className="text-white/80 text-sm md:text-base">Datum účinnosti: 21. 10. 2026</p>
         </div>
       </section>
 
@@ -126,8 +126,32 @@ export default function OchranaOsobnichUdajuNemovitostiPage() {
               6. Předání osobních údajů třetím stranám
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-4">
-              Údaje z poptávek zajištěných nemovitostí nepředáváme třetím stranám, s výjimkou případů, kdy nám to
-              ukládá právní předpis.
+              Údaje z poptávek zajištěných nemovitostí nepředáváme třetím stranám za účelem jejich vlastního využití, s
+              výjimkou případů, kdy nám to ukládá právní předpis.
+            </p>
+            <p className="text-base text-muted-foreground leading-relaxed mb-4">
+              Osobní údaje však mohou být zpřístupněny těmto kategoriím příjemců:
+            </p>
+            <ul className="list-disc pl-6 text-base text-muted-foreground leading-relaxed space-y-2 mb-6">
+              <li>
+                poskytovatelům poštovních a doručovacích služeb, zejména Česká pošta, s.p., v rozsahu jméno, příjmení a
+                adresa, výhradně za účelem doručení zásilek s nabídkou našich služeb (viz čl. 4),
+              </li>
+              <li>
+                poskytovatelům hostingu, provozu webu a e-mailových služeb, kteří pro nás údaje zpracovávají jako
+                zpracovatelé na základě smlouvy a podle našich pokynů,
+              </li>
+              <li>
+                poskytovatelům analytických a reklamních nástrojů v rozsahu uvedeném v čl. 8 a v{" "}
+                <Link href="/zasady-cookies" className="text-primary no-underline hover:underline">
+                  Zásadách cookies
+                </Link>
+                .
+              </li>
+            </ul>
+            <p className="text-base text-muted-foreground leading-relaxed mb-4">
+              Osobní údaje nepředáváme do třetích zemí mimo EU/EHP, s výjimkou případů, kdy je předání zajištěno v
+              souladu s kapitolou V GDPR.
             </p>
 
             <h2 className="text-xl md:text-2xl font-bold text-foreground mt-12 mb-4">7. Doba uchování údajů</h2>
