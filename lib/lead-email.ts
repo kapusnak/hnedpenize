@@ -10,6 +10,12 @@ export type LeadPayload = {
   serviceType?: string
   propertyAddress?: string
   pagePath?: string
+  /** Structured car fields. Sent for assetType Automobil; not parsed out of serviceType. */
+  vehicleModel?: string
+  vehicleYear?: string
+  vehicleMileage?: string
+  vehicleVin?: string
+  contractDurationMonths?: string
 }
 
 /** Brand + contact used in operator/client e-mails for this site. */
@@ -27,6 +33,90 @@ const SITE = {
 const CALLBACK_ONLY_SERVICE = "Není relevantní (Callback)"
 const CALLBACK_ONLY_AMOUNT = "--- Pouze požadavek na zavolání ---"
 const PLACEHOLDER = "---"
+const AUTOMOBILE_ASSET = "Automobil"
+
+type VehicleEmailFields = {
+  model: string
+  year: string
+  mileage: string
+  vin: string
+  contractDuration: string
+}
+
+function displayOrPlaceholder(value: string | undefined): string {
+  const trimmed = value?.trim() ?? ""
+  return trimmed || PLACEHOLDER
+}
+
+/** Structured mileage from the form, shown as `230636 km`. */
+function formatMileageKm(value: string | undefined): string {
+  const trimmed = value?.trim() ?? ""
+  if (!trimmed) return PLACEHOLDER
+  if (/km\s*$/i.test(trimmed)) return trimmed
+  return `${trimmed} km`
+}
+
+/** Structured contract length from the form, shown as `36 měs.` */
+function formatContractDuration(value: string | undefined): string {
+  const trimmed = value?.trim() ?? ""
+  if (!trimmed) return PLACEHOLDER
+  if (/měs\.?\s*$/i.test(trimmed)) return trimmed
+  return `${trimmed} měs.`
+}
+
+function vehicleEmailFields(params: LeadPayload): VehicleEmailFields {
+  return {
+    model: displayOrPlaceholder(params.vehicleModel),
+    year: displayOrPlaceholder(params.vehicleYear),
+    mileage: formatMileageKm(params.vehicleMileage),
+    vin: displayOrPlaceholder(params.vehicleVin),
+    contractDuration: formatContractDuration(params.contractDurationMonths),
+  }
+}
+
+function vehicleTextLines(vehicle: VehicleEmailFields): string[] {
+  return [
+    `Značka a model vozu: ${vehicle.model}`,
+    `Rok výroby: ${vehicle.year}`,
+    `Najeté km: ${vehicle.mileage}`,
+    `VIN: ${vehicle.vin}`,
+    `Délka smlouvy: ${vehicle.contractDuration}`,
+  ]
+}
+
+function notifyValueRow(label: string, value: string): string {
+  return `<tr>
+          <td style="padding: 5px 0; vertical-align: top;"><strong>${escapeHtml(label)}:</strong></td>
+          <td style="padding: 5px 0; text-align: right; font-weight: 500; vertical-align: top;">${escapeHtml(value)}</td>
+        </tr>`
+}
+
+function clientValueRow(label: string, value: string): string {
+  return `<tr>
+          <td style="padding: 5px 0; width: 50%; vertical-align: top;"><strong>${escapeHtml(label)}:</strong></td>
+          <td style="padding: 5px 0; text-align: right; vertical-align: top;">${escapeHtml(value)}</td>
+        </tr>`
+}
+
+function vehicleNotifyRows(vehicle: VehicleEmailFields): string {
+  return [
+    notifyValueRow("Značka a model vozu", vehicle.model),
+    notifyValueRow("Rok výroby", vehicle.year),
+    notifyValueRow("Najeté km", vehicle.mileage),
+    notifyValueRow("VIN", vehicle.vin),
+    notifyValueRow("Délka smlouvy", vehicle.contractDuration),
+  ].join("\n        ")
+}
+
+function vehicleClientRows(vehicle: VehicleEmailFields): string {
+  return [
+    clientValueRow("Značka a model vozu", vehicle.model),
+    clientValueRow("Rok výroby", vehicle.year),
+    clientValueRow("Najeté km", vehicle.mileage),
+    clientValueRow("VIN", vehicle.vin),
+    clientValueRow("Délka smlouvy", vehicle.contractDuration),
+  ].join("\n        ")
+}
 
 /**
  * Compact E.164-style number for `tel:` links (no spaces).
@@ -122,6 +212,8 @@ function buildNotifyHtml(fields: {
   serviceType: string
   amount: string
   ip: string
+  /** Set only for Automobil. Address row is omitted and car fields are separate rows. */
+  vehicle: VehicleEmailFields | null
 }): string {
   const emailCell = fields.email
     ? `<a href="mailto:${escapeHtml(fields.email)}" style="color: #1a5a9c; text-decoration: none;">${escapeHtml(fields.email)}</a>`
@@ -166,18 +258,22 @@ function buildNotifyHtml(fields: {
         <tr>
           <td colspan="2" style="padding: 5px 0; border-top: 1px dashed #cccccc;"></td>
         </tr>
-        <tr>
+        ${
+          fields.vehicle
+            ? ""
+            : `<tr>
           <td style="padding: 5px 0;"><strong>Adresa nemovitosti:</strong></td>
           <td style="padding: 5px 0; text-align: right; font-weight: 500;">${escapeHtml(fields.propertyAddress)}</td>
         </tr>
-        <tr>
+        `
+        }<tr>
           <td style="padding: 5px 0;"><strong>Typ zajištění:</strong></td>
           <td style="padding: 5px 0; text-align: right; font-weight: 500;">${escapeHtml(fields.propertyType)}</td>
         </tr>
         <tr>
           <td style="padding: 5px 0;"><strong>Požadovaná služba:</strong></td>
           <td style="padding: 5px 0; text-align: right; font-weight: 500;">${escapeHtml(fields.serviceType)}</td>
-        </tr>
+        </tr>${fields.vehicle ? `\n        ${vehicleNotifyRows(fields.vehicle)}` : ""}
       </tbody>
     </table>
   </div>
@@ -194,6 +290,7 @@ function buildClientHtml(fields: {
   propertyType: string
   serviceType: string
   amount: string
+  vehicle: VehicleEmailFields | null
 }): string {
   const phoneLines = SITE.phones
     .map(
@@ -222,7 +319,7 @@ function buildClientHtml(fields: {
         <tr>
           <td style="padding: 5px 0;"><strong>Typ služby:</strong></td>
           <td style="padding: 5px 0; text-align: right;">${escapeHtml(fields.serviceType)}</td>
-        </tr>
+        </tr>${fields.vehicle ? `\n        ${vehicleClientRows(fields.vehicle)}` : ""}
       </tbody>
     </table>
     <div style="margin-top: 15px; padding: 10px; background-color: #fff9e6; border: 1px solid #ffcc66; border-radius: 6px; text-align: center;">
@@ -259,6 +356,8 @@ function buildClientHtml(fields: {
 
 export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLeadEmails {
   const callback = isCallbackOnly(params.source)
+  const automobile = !callback && (params.assetType ?? "").trim() === AUTOMOBILE_ASSET
+  const vehicle = automobile ? vehicleEmailFields(params) : null
   const propertyType = callback ? PLACEHOLDER : (params.assetType ?? PLACEHOLDER)
   const propertyAddress = callback ? PLACEHOLDER : (params.propertyAddress?.trim() || PLACEHOLDER)
   const phoneTel = normalizePhoneForTel(params.phone)
@@ -289,9 +388,10 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
     `Telefon: ${phoneDisplay}`,
     `E-mail: ${email || PLACEHOLDER}`,
     `IP adresa: ${ip}`,
-    `Adresa nemovitosti: ${propertyAddress}`,
+    ...(vehicle ? [] : [`Adresa nemovitosti: ${propertyAddress}`]),
     `Typ zajištění: ${propertyType}`,
     `Požadovaná služba: ${serviceType}`,
+    ...(vehicle ? vehicleTextLines(vehicle) : []),
     `Částka: ${amount}`,
   ].join("\n")
 
@@ -306,6 +406,7 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
     serviceType,
     amount,
     ip,
+    vehicle,
   })
 
   const clientNameForBody = callback ? PLACEHOLDER : name
@@ -319,6 +420,7 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
     `Jméno: ${clientNameForBody}`,
     `Typ zajištění: ${propertyType}`,
     `Typ služby: ${serviceType}`,
+    ...(vehicle ? vehicleTextLines(vehicle) : []),
     `Požadovaná částka: ${amount}`,
     "",
     "Obvykle se Vám ozveme do 30 minut v pracovní době (Po–Pá: 8:00 – 18:00).",
@@ -335,6 +437,7 @@ export function buildLeadEmails(params: LeadPayload & { ip: string }): BuiltLead
     propertyType,
     serviceType,
     amount,
+    vehicle,
   })
 
   return {

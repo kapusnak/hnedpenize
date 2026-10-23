@@ -186,6 +186,7 @@ const realEstateServices = [
 
 const DEFAULT_REAL_ESTATE_AMOUNT = 2000000
 const DEFAULT_CAR_AMOUNT = 100000
+const CAR_SERVICE_LABEL = "Peníze ihned a jezděte dál"
 
 const serviceTypeEnum = z.enum(["zpetny-leasing", "zastava", "primy-vykup", "bez-zajisteni"])
 
@@ -431,11 +432,7 @@ export function LoanCalculator({ embedded = false }: { embedded?: boolean }) {
         name = `${values.firstName.trim()} ${values.lastName.trim()}`.trim()
         amount = snapToCarValue(values.vehicleAmountCzk)
         assetType = "Automobil"
-        const vinPart = values.vin.trim() ? `, VIN ${values.vin.trim()}` : ""
-        const contractPart = values.contractDurationMonths.trim()
-          ? `, trvání smlouvy ${values.contractDurationMonths.trim()} měs.`
-          : ""
-        serviceType = `Peníze ihned a jezděte dál — ${values.vehicleModel.trim()}, r.v. ${values.year.trim()}, ${values.mileage.trim()} km${vinPart}${contractPart}`
+        serviceType = CAR_SERVICE_LABEL
       }
       await sendLead({
         source: "calculator",
@@ -446,6 +443,15 @@ export function LoanCalculator({ embedded = false }: { embedded?: boolean }) {
         assetType,
         serviceType,
         ...(propertyAddress ? { propertyAddress } : {}),
+        ...(values.assetMode === "car"
+          ? {
+              vehicleModel: values.vehicleModel.trim(),
+              vehicleYear: values.year.trim(),
+              vehicleMileage: values.mileage.trim(),
+              vehicleVin: values.vin.trim(),
+              contractDurationMonths: values.contractDurationMonths.trim(),
+            }
+          : {}),
       })
       setSubmitStatus("success")
       toast.success("Děkujeme za poptávku", {

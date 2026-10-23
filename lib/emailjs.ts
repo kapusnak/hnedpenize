@@ -12,6 +12,12 @@ export type LeadParams = {
   propertyAddress?: string
   /** Current path for GA (e.g. /kontakty); set for popup/cta phone leads */
   pagePath?: string
+  /** Structured car fields for assetType Automobil. */
+  vehicleModel?: string
+  vehicleYear?: string
+  vehicleMileage?: string
+  vehicleVin?: string
+  contractDurationMonths?: string
 }
 
 export async function sendLead(params: LeadParams): Promise<void> {
@@ -28,6 +34,13 @@ export async function sendLead(params: LeadParams): Promise<void> {
       ...(params.serviceType != null ? { serviceType: params.serviceType } : {}),
       ...(params.propertyAddress != null ? { propertyAddress: params.propertyAddress } : {}),
       ...(params.pagePath != null ? { pagePath: params.pagePath } : {}),
+      ...(params.vehicleModel != null ? { vehicleModel: params.vehicleModel } : {}),
+      ...(params.vehicleYear != null ? { vehicleYear: params.vehicleYear } : {}),
+      ...(params.vehicleMileage != null ? { vehicleMileage: params.vehicleMileage } : {}),
+      ...(params.vehicleVin != null ? { vehicleVin: params.vehicleVin } : {}),
+      ...(params.contractDurationMonths != null
+        ? { contractDurationMonths: params.contractDurationMonths }
+        : {}),
     }),
   })
 
